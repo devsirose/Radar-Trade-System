@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: rts-account-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/account-service?sslmode=disable
+    password: mysecretpassword
+    username: root
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 600000
+      connection-timeout: 30000
+      pool-name: HikariPool
+server:
+  port: 8090
