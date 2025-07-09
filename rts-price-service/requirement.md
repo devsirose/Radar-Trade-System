@@ -61,3 +61,5 @@
 - Dự đoán bằng AI
 - Kiểm thử chiến lược đầu tư (Backtesting)
 
+## **Note**
+**refactoring Spring integration**
