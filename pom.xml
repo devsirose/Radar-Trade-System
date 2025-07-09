@@ -48,13 +48,22 @@
 		<lombok-version>1.18.36</lombok-version>
 		<jackson-binding.version>2.18.3</jackson-binding.version>
 		<spring-boot.version>3.4.7</spring-boot.version>
-		<spring-cloud.version>2023.0.1</spring-cloud.version>
+		<spring-cloud.version>2024.0.1</spring-cloud.version>
 		<maven-compile-plugin.version>3.14.0</maven-compile-plugin.version>
 		<postgresql.version>42.7.3</postgresql.version>
 		<prometheus.version>1.14.8</prometheus.version>
 	</properties>
 
 	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
 	</dependencyManagement>
 
 	<build>

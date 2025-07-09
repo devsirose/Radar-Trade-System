@@ -1,4 +1,4 @@
-package com.radartrader.platform.service.common.dto.response;
+package com.radartrade.platform.service.common.dto.response;
 
 import java.io.Serializable;
 

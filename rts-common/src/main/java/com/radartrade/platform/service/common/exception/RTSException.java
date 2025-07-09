@@ -1,6 +1,6 @@
-package com.radartrader.platform.service.common.exception;
+package com.radartrade.platform.service.common.exception;
 
-import com.radartrader.platform.service.common.constant.ErrorCode;
+import com.radartrade.platform.service.common.constant.ErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
