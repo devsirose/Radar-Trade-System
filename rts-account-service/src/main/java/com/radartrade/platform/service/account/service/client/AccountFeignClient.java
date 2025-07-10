@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient("${spring.application.name}")
-public class AccountFeignClient {
+public interface AccountFeignClient {
     @GetMapping(value = "/api/v1/account", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity<BaseResponse> getResponse(@RequestParam Long accountId) {
-        return null;
-    }
+    ResponseEntity<BaseResponse> getResponse(@RequestParam Long accountId);
 }
