@@ -28,7 +28,7 @@
 		<module>rts-auth-service</module>
 		<module>rts-api-gateway</module>
 		<module>rts-ws-gateway</module>
-		<module>rts-discovery-service</module>
+		<module>rts-discovery-server</module>
 		<module>rts-price-service</module>
 		<module>rts-backtest-service</module>
 		<module>rts-ml-inference-service</module>
