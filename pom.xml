@@ -35,6 +35,7 @@
 		<module>rts-sentiment-service</module>
 		<module>rts-order-service</module>
 		<module>rts-order-book-service</module>
+		<module>rts-exchange-gateway-processor</module>
 	</modules>
 	<scm>
 		<connection/>
