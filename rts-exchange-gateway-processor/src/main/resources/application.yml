@@ -2,7 +2,7 @@ spring:
   application:
     name: exchange-processor
   datasource:
-    url: jdbc:postgresql://localhost:5432/account-service?sslmode=disable
+    url: jdbc:postgresql://localhost:5431/market-price?sslmode=disable
     password: mysecretpassword
     username: root
     driver-class-name: org.postgresql.Driver
