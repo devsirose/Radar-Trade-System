@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: exchange-processor
+  datasource:
+    url: jdbc:postgresql://localhost:5432/account-service?sslmode=disable
+    password: mysecretpassword
+    username: root
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 600000
+      connection-timeout: 30000
+      pool-name: HikariPool
+server:
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+    shutdown:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+endpoint:
+  shutdown:
+    enabled: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  # standalone mode
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+
+
+ws:
+  binance:
+    api:
+      price:
+      uri : wss://stream.binance.com:9443/ws/
