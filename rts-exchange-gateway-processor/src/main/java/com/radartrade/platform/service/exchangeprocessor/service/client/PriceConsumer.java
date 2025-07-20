@@ -5,7 +5,7 @@ import com.radartrade.platform.service.exchangeprocessor.domain.PriceUpdate;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
 import reactor.core.publisher.Flux;
@@ -14,12 +14,11 @@ import reactor.core.publisher.Sinks;
 import java.net.URI;
 import java.time.Instant;
 
-@Service
+@Component
 @Slf4j
 public class PriceConsumer {
     @Value("${ws.binance.api.uri}")
     private String WS_URI ;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Sinks.Many<PriceUpdate> sink = Sinks.many().multicast().onBackpressureBuffer();
 
