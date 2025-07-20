@@ -52,6 +52,7 @@
 		<spring-cloud.version>2024.0.1</spring-cloud.version>
 		<maven-compile-plugin.version>3.14.0</maven-compile-plugin.version>
 		<postgresql.version>42.7.3</postgresql.version>
+		<r2dbc.version>1.0.7.RELEASE</r2dbc.version>
 		<prometheus.version>1.14.8</prometheus.version>
 		<okhttp.version>5.1.0</okhttp.version>
 	</properties>

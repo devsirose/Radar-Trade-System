@@ -1,7 +1,9 @@
 package com.radartrade.platform.service.exchangeprocessor.repository;
 
 import com.radartrade.platform.service.exchangeprocessor.domain.KlineUpdate;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface KlineRepository extends JpaRepository<KlineUpdate, Long> {
+@Repository
+public interface KlineRepository extends ReactiveCrudRepository<KlineUpdate, Long> {
 }
