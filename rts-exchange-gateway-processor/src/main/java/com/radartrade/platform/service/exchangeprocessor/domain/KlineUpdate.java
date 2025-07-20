@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 @Data
 @Entity
-@Table(name = "kline")
+@Table(name = "klines")
 public class KlineUpdate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

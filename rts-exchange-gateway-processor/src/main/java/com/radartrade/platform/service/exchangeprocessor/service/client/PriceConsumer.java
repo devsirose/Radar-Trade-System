@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
 import java.net.URI;
+import java.time.Instant;
 
 @Service
 @Slf4j
@@ -50,7 +51,7 @@ public class PriceConsumer {
             PriceUpdate update = new PriceUpdate();
             update.setSymbol(node.get("s").asText());
             update.setPrice(node.get("p").asLong());
-            update.setEventTime(node.get("E").asLong());
+            update.setEventTime(Instant.ofEpochMilli(node.get("E").asLong()));
             return update;
         } catch (Exception e) {
             log.error("Failed to parse message: {}", json, e);
