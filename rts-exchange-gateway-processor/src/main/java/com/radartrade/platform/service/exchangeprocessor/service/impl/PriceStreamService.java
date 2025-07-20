@@ -7,21 +7,21 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
-public class PriceService {
+public class PriceStreamService {
     private final PriceConsumer priceService;
     private final PriceRepository priceRepository;
 
-    public PriceService(PriceConsumer priceService, PriceRepository priceRepository) {
+    public PriceStreamService(PriceConsumer priceService, PriceRepository priceRepository) {
         this.priceService = priceService;
         this.priceRepository = priceRepository;
     }
 
     /**
-     * fixme: use R2DBC save object to db
+     * fixed: use R2DBC save object to db
      * @param priceUpdates
      */
-    public void savePriceUpdate(Flux<PriceUpdate> priceUpdates) {
-        priceService.priceUpdatesStream()
-                .subscribe();
+    public Flux<PriceUpdate> saveAllPriceUpdates(Flux<PriceUpdate> priceUpdates) {
+        return priceService.priceUpdatesStream()
+                .flatMap(priceRepository::save);
     }
 }

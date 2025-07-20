@@ -1,7 +1,12 @@
 package com.radartrade.platform.service.exchangeprocessor.domain;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @Entity
@@ -12,6 +17,7 @@ public class PriceUpdate {
     private Long id;
 
     private String symbol;
-    private String price;
+    private long price;
     private long eventTime;
+
 }

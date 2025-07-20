@@ -1,7 +1,7 @@
 spring:
   application:
     name: exchange-processor
-  datasource:
+  r2dbc:
     url: r2dbc:postgresql://localhost:5431/market-price?sslmode=disable
     password: mysecretpassword
     username: root
@@ -47,4 +47,4 @@ ws:
   binance:
     api:
       price:
-      uri : wss://stream.binance.com:9443/ws/
+      uri : wss://stream.binance.com:9443/ws/btcusdt@trade
