@@ -8,20 +8,18 @@ import reactor.core.publisher.Flux;
 
 @Service
 public class PriceStreamService {
-    private final PriceConsumer priceService;
     private final PriceRepository priceRepository;
 
-    public PriceStreamService(PriceConsumer priceService, PriceRepository priceRepository) {
-        this.priceService = priceService;
+    public PriceStreamService(PriceRepository priceRepository) {
         this.priceRepository = priceRepository;
     }
 
     /**
      * fixed: use R2DBC save object to db
-     * @param priceUpdates
+     * @param
      */
-    public Flux<PriceUpdate> saveAllPriceUpdates(Flux<PriceUpdate> priceUpdates) {
-        return priceService.priceUpdatesStream()
+    public Flux<PriceUpdate> constructFluxPriceUpdates(PriceConsumer priceConsumer) {
+        return priceConsumer.priceUpdatesStream()
                 .flatMap(priceRepository::save);
     }
 }

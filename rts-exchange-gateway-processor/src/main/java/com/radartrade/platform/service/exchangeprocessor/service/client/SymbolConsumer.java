@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.radartrade.platform.service.common.constant.ErrorCode;
 import com.radartrade.platform.service.common.exception.AppException;
 import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
+import com.radartrade.platform.service.exchangeprocessor.util.MapperUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestClient;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,20 +26,20 @@ public class SymbolConsumer {
     private String EXCHANGE_INFO_URI = "/api/v3/exchangeInfo";
     private RestClient symbolConsumerClient;
     private List<Symbol> symbols;
-    private final ObjectMapper objectMapper;
-
-    public SymbolConsumer(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+    private final ObjectMapper objectMapper = MapperUtil.objectMapper();
 
     @PostConstruct
     private void connect() {
         symbolConsumerClient = RestClient.create(EXCHANGE_BASE_URL);
-        symbols = getListSymbol(symbolConsumerClient);
+        symbols = initListSymbols();
     }
 
-    private List<Symbol> getListSymbol(RestClient client) {
-        String response = client
+    public List<Symbol> getSymbols() {
+        return symbols;
+    }
+
+    private List<Symbol> initListSymbols() {
+        String response = symbolConsumerClient
                 .get()
                 .uri(EXCHANGE_INFO_URI)
                 .accept(MediaType.APPLICATION_JSON)
@@ -54,7 +56,7 @@ public class SymbolConsumer {
             List<LinkedHashMap<String, Object>> symbolsList  = objectMapper.readValue(symbolsString, List.class);
             List<Symbol> result =  symbolsList.stream()
                     .map(e ->
-                            new Symbol(e.get("symbol").toString())
+                            new Symbol(e.get("symbol").toString().toLowerCase(Locale.ROOT))
                     )
                     .collect(Collectors.toList());
             return result;
