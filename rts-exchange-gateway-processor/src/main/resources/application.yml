@@ -43,8 +43,9 @@ eureka:
       default-zone: http://localhost:8761/eureka/
 
 
-ws:
-  binance:
+exchange:
     api:
-      price:
-      uri : wss://stream.binance.com:9443/ws/btcusdt@trade
+      rest:
+        base-url: https://api.binance.com
+      ws:
+        base-url : wss://stream.binance.com:9443/ws/btcusdt@trade

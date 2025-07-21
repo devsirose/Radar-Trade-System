@@ -17,10 +17,14 @@ import java.time.Instant;
 @Component
 @Slf4j
 public class PriceConsumer {
-    @Value("${ws.binance.api.uri}")
+    @Value("${exchange.api.ws.base-url}")
     private String WS_URI ;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final Sinks.Many<PriceUpdate> sink = Sinks.many().multicast().onBackpressureBuffer();
+
+    public PriceConsumer(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     public Flux<PriceUpdate> priceUpdatesStream() {
         return sink.asFlux();
