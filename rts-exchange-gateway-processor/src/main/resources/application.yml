@@ -5,6 +5,10 @@ spring:
     url: r2dbc:postgresql://localhost:5431/market-price?sslmode=disable
     password: mysecretpassword
     username: root
+  data:
+    redis:
+      host: localhost
+      port: 6379
 server:
   port: 8082
 

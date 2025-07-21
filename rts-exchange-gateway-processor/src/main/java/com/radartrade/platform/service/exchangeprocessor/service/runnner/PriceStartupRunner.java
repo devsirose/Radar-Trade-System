@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.service.client.PriceConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
-import com.radartrade.platform.service.exchangeprocessor.service.impl.PriceStreamService;
+import com.radartrade.platform.service.exchangeprocessor.service.impl.PricePublisherStreamService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,11 +16,11 @@ import java.util.List;
 @Slf4j
 public class PriceStartupRunner implements ApplicationRunner {
 
-    private final PriceStreamService priceStreamService;
+    private final PricePublisherStreamService priceStreamService;
     private final SymbolConsumer symbolConsumer;
     private final int MAX_SUBSTREAM = 1000;
     public PriceStartupRunner(
-            PriceStreamService priceStreamService,
+            PricePublisherStreamService priceStreamService,
             SymbolConsumer symbolConsumer, ObjectMapper objectMapper) {
         this.priceStreamService = priceStreamService;
         this.symbolConsumer = symbolConsumer;
