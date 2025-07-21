@@ -16,7 +16,7 @@ public class PriceUpdate {
     private Long id;
 
     private String symbol;
-    private long price;
+    private Double price;
     @Column(name = "event_time", nullable = false)
     private Instant eventTime;
 

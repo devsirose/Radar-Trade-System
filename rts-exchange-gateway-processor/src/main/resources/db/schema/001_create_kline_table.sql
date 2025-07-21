@@ -1,13 +1,13 @@
-CREATE TABLE klines (
+CREATE TABLE kline (
     symbol       TEXT,
     interval     TEXT,
     open_time    BIGINT,
     close_time   BIGINT,
-    open         NUMERIC,
-    high         NUMERIC,
-    low          NUMERIC,
-    close        NUMERIC,
-    volume       NUMERIC,
+    open         NUMERIC(18,8),
+    high         NUMERIC(18,8),
+    low          NUMERIC(18,8),
+    close        NUMERIC(18,8),
+    volume       NUMERIC(18,8),
     trades_count INTEGER,
     closed       BOOLEAN,
 

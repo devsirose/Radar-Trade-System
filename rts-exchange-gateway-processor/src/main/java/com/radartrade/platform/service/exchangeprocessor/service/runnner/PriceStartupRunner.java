@@ -6,7 +6,6 @@ import com.radartrade.platform.service.exchangeprocessor.service.client.PriceCon
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.impl.PriceStreamService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -19,23 +18,25 @@ public class PriceStartupRunner implements ApplicationRunner {
 
     private final PriceStreamService priceStreamService;
     private final SymbolConsumer symbolConsumer;
-    private final ObjectMapper objectMapper;
+    private final int MAX_SUBSTREAM = 1000;
     public PriceStartupRunner(
-            ObjectProvider<PriceConsumer> consumerFactory,
             PriceStreamService priceStreamService,
             SymbolConsumer symbolConsumer, ObjectMapper objectMapper) {
         this.priceStreamService = priceStreamService;
         this.symbolConsumer = symbolConsumer;
-        this.objectMapper = objectMapper;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         List<Symbol> symbols = symbolConsumer.getSymbols();
-        symbols.forEach(symbol -> {
-            PriceConsumer priceConsumer = new PriceConsumer(symbol.getName());
+
+        for (int i = 0; i < symbols.size(); i += MAX_SUBSTREAM) {
+            PriceConsumer priceConsumer = new PriceConsumer(
+                    symbols.subList(i, Math.min((i + MAX_SUBSTREAM), symbols.size()))
+            );
             priceStreamService.constructFluxPriceUpdates(priceConsumer)
                     .subscribe();
-        });
+        }
+
     }
 }

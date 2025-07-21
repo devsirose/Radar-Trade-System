@@ -2,11 +2,9 @@ package com.radartrade.platform.service.exchangeprocessor.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.math.BigDecimal;
 @Data
 @Entity
-@Table(name = "klines")
+@Table(name = "kline")
 public class KlineUpdate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,12 +15,12 @@ public class KlineUpdate {
     private long openTime;       // Timestamp mở nến (milliseconds)
     private long closeTime;      // Timestamp đóng nến (milliseconds)
 
-    private BigDecimal open;     // Giá mở cửa
-    private BigDecimal high;     // Giá cao nhất
-    private BigDecimal low;      // Giá thấp nhất
-    private BigDecimal close;    // Giá đóng cửa
+    private Double open;     // Giá mở cửa
+    private Double high;     // Giá cao nhất
+    private Double low;      // Giá thấp nhất
+    private Double close;    // Giá đóng cửa
 
-    private BigDecimal volume;   // Volume (base asset)
+    private Double volume;   // Volume (base asset)
     private int tradesCount;     // Số lượng giao dịch trong nến
 
     private boolean closed;      // Đánh dấu đã khép nến (true nếu nến đã kết thúc)

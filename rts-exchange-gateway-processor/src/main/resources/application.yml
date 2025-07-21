@@ -5,8 +5,6 @@ spring:
     url: r2dbc:postgresql://localhost:5431/market-price?sslmode=disable
     password: mysecretpassword
     username: root
-    pool:
-      initial-size: 4000
 server:
   port: 8082
 
