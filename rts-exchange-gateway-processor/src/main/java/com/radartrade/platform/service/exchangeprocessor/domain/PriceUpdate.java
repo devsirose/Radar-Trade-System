@@ -8,11 +8,9 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.Instant;
 
 @Data
-@Entity
 @Table(name = "price")
 public class PriceUpdate {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String symbol;

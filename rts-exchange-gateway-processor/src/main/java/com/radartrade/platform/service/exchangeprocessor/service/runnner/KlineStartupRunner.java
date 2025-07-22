@@ -1,10 +1,9 @@
 package com.radartrade.platform.service.exchangeprocessor.service.runnner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
-import com.radartrade.platform.service.exchangeprocessor.service.client.PriceConsumer;
+import com.radartrade.platform.service.exchangeprocessor.service.client.KlineConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
-import com.radartrade.platform.service.exchangeprocessor.service.impl.PricePublisherStreamService;
+import com.radartrade.platform.service.exchangeprocessor.service.impl.KlinePublisherStreamService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -14,16 +13,14 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class PriceStartupRunner implements ApplicationRunner {
+public class KlineStartupRunner implements ApplicationRunner {
 
-    private final PricePublisherStreamService priceStreamService;
     private final SymbolConsumer symbolConsumer;
     private final int MAX_SUBSTREAM = 100;
-    public PriceStartupRunner(
-            PricePublisherStreamService priceStreamService,
-            SymbolConsumer symbolConsumer, ObjectMapper objectMapper) {
-        this.priceStreamService = priceStreamService;
-        this.symbolConsumer = symbolConsumer;
+    private final KlinePublisherStreamService klinePublisherStreamService;
+    public KlineStartupRunner(SymbolConsumer symbolConsumer1, KlinePublisherStreamService klinePublisherStreamService) {
+        this.symbolConsumer = symbolConsumer1;
+        this.klinePublisherStreamService = klinePublisherStreamService;
     }
 
     @Override
@@ -31,12 +28,12 @@ public class PriceStartupRunner implements ApplicationRunner {
         List<Symbol> symbols = symbolConsumer.getSymbols();
 
         for (int i = 0; i < symbols.size(); i += MAX_SUBSTREAM) {
-            PriceConsumer priceConsumer = new PriceConsumer(
+            KlineConsumer klineConsumer = new KlineConsumer(
                     symbols.subList(i, Math.min((i + MAX_SUBSTREAM), symbols.size()))
             );
-            priceStreamService.constructFluxPriceUpdates(priceConsumer)
+
+            klinePublisherStreamService.constructFluxKlineUpdates(klineConsumer)
                     .subscribe();
         }
-
     }
 }
