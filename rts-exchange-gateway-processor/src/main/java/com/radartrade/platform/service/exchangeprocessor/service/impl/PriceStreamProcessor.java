@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
-public class PricePublisherStreamService {
+public class PriceStreamProcessor {
     private final PriceRepository priceRepository;
 
-    public PricePublisherStreamService(PriceRepository priceRepository) {
+    public PriceStreamProcessor(PriceRepository priceRepository) {
         this.priceRepository = priceRepository;
     }
 

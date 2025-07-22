@@ -3,7 +3,7 @@ package com.radartrade.platform.service.exchangeprocessor.service.runnner;
 import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.service.client.KlineConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
-import com.radartrade.platform.service.exchangeprocessor.service.impl.KlinePublisherStreamService;
+import com.radartrade.platform.service.exchangeprocessor.service.impl.KlineStreamProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -17,10 +17,10 @@ public class KlineStartupRunner implements ApplicationRunner {
 
     private final SymbolConsumer symbolConsumer;
     private final int MAX_SUBSTREAM = 100;
-    private final KlinePublisherStreamService klinePublisherStreamService;
-    public KlineStartupRunner(SymbolConsumer symbolConsumer1, KlinePublisherStreamService klinePublisherStreamService) {
+    private final KlineStreamProcessor klineStreamProcessor;
+    public KlineStartupRunner(SymbolConsumer symbolConsumer1, KlineStreamProcessor klineStreamProcessor) {
         this.symbolConsumer = symbolConsumer1;
-        this.klinePublisherStreamService = klinePublisherStreamService;
+        this.klineStreamProcessor = klineStreamProcessor;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class KlineStartupRunner implements ApplicationRunner {
                     symbols.subList(i, Math.min((i + MAX_SUBSTREAM), symbols.size()))
             );
 
-            klinePublisherStreamService.constructFluxKlineUpdates(klineConsumer)
+            klineStreamProcessor.constructFluxKlineUpdates(klineConsumer)
                     .subscribe();
         }
     }

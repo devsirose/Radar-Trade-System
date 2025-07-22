@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
-public class KlinePublisherStreamService {
+public class KlineStreamProcessor {
 
     private final KlineRepository klineRepository;
 
-    public KlinePublisherStreamService(KlineRepository klineRepository) {
+    public KlineStreamProcessor(KlineRepository klineRepository) {
         this.klineRepository = klineRepository;
     }
 
