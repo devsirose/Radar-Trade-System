@@ -32,7 +32,7 @@ public class KlineStartupRunner implements ApplicationRunner {
                     symbols.subList(i, Math.min((i + MAX_SUBSTREAM), symbols.size()))
             );
 
-            klineStreamProcessor.constructFluxKlineUpdates(klineConsumer)
+            klineStreamProcessor.constructFluxKlineUpdates(klineConsumer.klineUpdateStream())
                     .subscribe();
         }
     }

@@ -34,7 +34,7 @@ public class PriceStartupRunner implements ApplicationRunner {
             PriceConsumer priceConsumer = new PriceConsumer(
                     symbols.subList(i, Math.min((i + MAX_SUBSTREAM), symbols.size()))
             );
-            priceStreamService.constructFluxPriceUpdates(priceConsumer)
+            priceStreamService.consumeAndSavePriceUpdates(priceConsumer.priceUpdatesStream())
                     .subscribe();
         }
 
