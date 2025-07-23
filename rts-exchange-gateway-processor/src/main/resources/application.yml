@@ -51,3 +51,7 @@ exchange:
     api:
       rest:
         base-url: https://api.binance.com
+
+my:
+  runner:
+    enabled: false

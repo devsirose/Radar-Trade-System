@@ -8,12 +8,14 @@ import com.radartrade.platform.service.exchangeprocessor.service.impl.PriceStrea
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 @Slf4j
+@ConditionalOnProperty(name = "my.runner.enabled", havingValue = "true")
 public class PriceStartupRunner implements ApplicationRunner {
 
     private final PriceStreamProcessor priceStreamService;

@@ -7,12 +7,14 @@ import com.radartrade.platform.service.exchangeprocessor.service.impl.KlineStrea
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 @Slf4j
+@ConditionalOnProperty(name = "my.runner.enabled", havingValue = "true")
 public class KlineStartupRunner implements ApplicationRunner {
 
     private final SymbolConsumer symbolConsumer;
