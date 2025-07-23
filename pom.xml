@@ -54,6 +54,8 @@
 		<r2dbc.version>1.0.7.RELEASE</r2dbc.version>
 		<prometheus.version>1.14.8</prometheus.version>
 		<okhttp.version>5.1.0</okhttp.version>
+		<redisson.version>3.47.0</redisson.version>
+		<reactor-test.version>3.4.7</reactor-test.version>
 	</properties>
 
 	<dependencyManagement>
