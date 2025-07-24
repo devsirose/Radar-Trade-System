@@ -1,16 +1,16 @@
 package com.radartrade.platform.service.exchangeprocessor.service.impl;
 
 import com.radartrade.platform.service.exchangeprocessor.domain.PriceUpdate;
-import com.radartrade.platform.service.exchangeprocessor.repository.PriceRepository;
+import com.radartrade.platform.service.exchangeprocessor.repository.PriceReactiveRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
 public class PriceStreamProcessor {
-    private final PriceRepository priceRepository;
+    private final PriceReactiveRepository priceReactiveRepository;
 
-    public PriceStreamProcessor(PriceRepository priceRepository) {
-        this.priceRepository = priceRepository;
+    public PriceStreamProcessor(PriceReactiveRepository priceReactiveRepository) {
+        this.priceReactiveRepository = priceReactiveRepository;
     }
 
     /**
@@ -19,6 +19,6 @@ public class PriceStreamProcessor {
      */
     public Flux<PriceUpdate> consumeAndSavePriceUpdates(Flux<PriceUpdate> priceUpdateFlux) {
         return priceUpdateFlux
-                .flatMap(priceRepository::save);
+                .flatMap(priceReactiveRepository::save);
     }
 }

@@ -54,4 +54,4 @@ exchange:
 
 my:
   runner:
-    enabled: false
+    enabled: true

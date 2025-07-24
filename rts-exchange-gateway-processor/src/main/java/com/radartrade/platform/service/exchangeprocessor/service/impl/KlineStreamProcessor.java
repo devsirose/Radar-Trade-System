@@ -1,16 +1,16 @@
 package com.radartrade.platform.service.exchangeprocessor.service.impl;
 
 import com.radartrade.platform.service.exchangeprocessor.domain.KlineUpdate;
-import com.radartrade.platform.service.exchangeprocessor.repository.KlineRepository;
+import com.radartrade.platform.service.exchangeprocessor.repository.KlineReactiveRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
 public class KlineStreamProcessor {
 
-    private final KlineRepository klineRepository;
+    private final KlineReactiveRepository klineRepository;
 
-    public KlineStreamProcessor(KlineRepository klineRepository) {
+    public KlineStreamProcessor(KlineReactiveRepository klineRepository) {
         this.klineRepository = klineRepository;
     }
 

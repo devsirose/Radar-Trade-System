@@ -1,9 +1,9 @@
 package com.radartrade.platform.service.exchangeprocessor.service.runnner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.service.client.PriceConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
+import com.radartrade.platform.service.exchangeprocessor.service.impl.PricePubService;
 import com.radartrade.platform.service.exchangeprocessor.service.impl.PriceStreamProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -18,14 +18,17 @@ import java.util.List;
 @ConditionalOnProperty(name = "my.runner.enabled", havingValue = "true")
 public class PriceStartupRunner implements ApplicationRunner {
 
+    private final PricePubService pricePubService;
     private final PriceStreamProcessor priceStreamService;
     private final SymbolConsumer symbolConsumer;
     private final int MAX_SUBSTREAM = 100;
     public PriceStartupRunner(
             PriceStreamProcessor priceStreamService,
-            SymbolConsumer symbolConsumer, ObjectMapper objectMapper) {
+            SymbolConsumer symbolConsumer,
+            PricePubService pricePubService) {
         this.priceStreamService = priceStreamService;
         this.symbolConsumer = symbolConsumer;
+        this.pricePubService = pricePubService;
     }
 
     @Override
@@ -36,7 +39,12 @@ public class PriceStartupRunner implements ApplicationRunner {
             PriceConsumer priceConsumer = new PriceConsumer(
                     symbols.subList(i, Math.min((i + MAX_SUBSTREAM), symbols.size()))
             );
-            priceStreamService.consumeAndSavePriceUpdates(priceConsumer.priceUpdatesStream())
+            priceStreamService.consumeAndSavePriceUpdates(
+                    priceConsumer.priceUpdatesStream()
+                    )
+                    .flatMap(priceUpdate ->
+                            pricePubService.publishPriceUpdate(priceUpdate)
+                    )
                     .subscribe();
         }
 
