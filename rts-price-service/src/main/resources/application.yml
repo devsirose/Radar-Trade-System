@@ -47,6 +47,10 @@ eureka:
     service-url:
       default-zone: http://localhost:8761/eureka/
 
+exchange:
+  api:
+    rest:
+      base-url: https://api.binance.com
 my:
   runner:
     enabled: true

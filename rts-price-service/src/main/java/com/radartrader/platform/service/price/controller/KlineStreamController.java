@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+import java.util.Locale;
+
 @RestController
 @RequestMapping("/api/v1/kline")
 public class KlineStreamController {
@@ -22,7 +24,9 @@ public class KlineStreamController {
     public Flux<KlineUpdate> getKline(@RequestParam String symbol,
                                       @RequestParam String interval,
                                       @RequestParam(defaultValue = "500") Integer limit) {
-        return klineStreamService.consumeKlineUpdate(symbol, interval, limit);
+        return klineStreamService.consumeKlineUpdate(symbol.toUpperCase(Locale.ROOT),
+                                                     interval,
+                                                     limit);
     }
 }
 

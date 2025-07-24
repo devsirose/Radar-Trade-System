@@ -1,93 +1,99 @@
 package com.radartrade.platform.service.exchangeprocessor.service.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.radartrade.platform.service.exchangeprocessor.domain.KlineInterval;
 import com.radartrade.platform.service.exchangeprocessor.domain.KlineUpdate;
-import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.util.MapperUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
 
-import java.net.URI;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
+@Service
 @Slf4j
 public class KlineConsumer {
-    private String WS_URI = "wss://stream.binance.com:9443/stream?streams=";
-    private static final String POST_FIX = "@kline";
-    private List<Symbol> symbols;
 
-    private ObjectMapper objectMapper = MapperUtil.objectMapper();
-    private final Sinks.Many<KlineUpdate> sink = Sinks.many().multicast().onBackpressureBuffer();
+    @Value("${exchange.api.rest.base-url}")
+    private String BASE_URL;
 
-    public KlineConsumer(List<Symbol> symbols) {
-        this.symbols = symbols;
-        connect();
-    }
+    private static final String KLINE_URI = "/api/v3/klines";
 
-    public Flux<KlineUpdate> klineUpdateStream() {
-        return sink.asFlux();
+    private RestClient client;
+    private final ObjectMapper objectMapper = MapperUtil.objectMapper();
+
+    public KlineConsumer() {
     }
 
     @PostConstruct
     private void connect() {
-        ReactorNettyWebSocketClient client = new ReactorNettyWebSocketClient();
-        client.execute(
-                URI.create(WS_URI + joinKlineStreams()),
-                session -> session.receive()
-                        .map(WebSocketMessage::getPayloadAsText)
-                        .map(this::parseKlineUpdate)
-                        .doOnNext(update -> {
-                            if (update != null) {
-                                sink.tryEmitNext(update);
-                            }
-                        })
-                        .doOnError(err -> log.error("WebSocket error: {}", err.getMessage()))
-                        .then()
-        ).subscribe();
+        client = RestClient.builder()
+                .baseUrl(BASE_URL)
+                .build();
     }
 
-    private String joinKlineStreams() {
-        return symbols.stream()
-                .flatMap(symbol ->
-                       KlineInterval.allIntervals().stream()
-                               .map(interval ->
-                                       symbol.getName().toLowerCase(Locale.ROOT) + POST_FIX + "_" + interval.getCode()
-                               )
-                ).collect(Collectors.joining("/"));
+    public Flux<KlineUpdate> getFluxKlineUpdate(String symbol, String interval, Integer limit) {
+        return Flux.fromIterable(
+                getListKlineUpdates(symbol, interval, limit)
+        );
     }
 
-    private  KlineUpdate parseKlineUpdate(String json) {
+    private List<KlineUpdate> getListKlineUpdates(String symbol, String interval, Integer limit) {
         try {
-            JsonNode root = objectMapper.readTree(json);
-            JsonNode data = root.get("data");
-            JsonNode k    = data.get("k");
+            String response = client
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(KLINE_URI)
+                            .queryParam("symbol", symbol)
+                            .queryParam("interval", interval)
+                            .queryParam("limit", limit)
+                            .build()
+                    )
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .body(String.class);
 
-            return KlineUpdate.builder()
-                    .symbol(data.get("s").asText())
-                    .interval(k.get("i").asText())
-                    .openTime(Instant.ofEpochMilli(k.get("t").asLong()))
-                    .closeTime(Instant.ofEpochMilli(k.get("T").asLong()))
-                    .open(k.get("o").asDouble())
-                    .high(k.get("h").asDouble())
-                    .low(k.get("l").asDouble())
-                    .close(k.get("c").asDouble())
-                    .volume(k.get("v").asDouble())
-                    .tradesCount(k.get("n").asInt())
-                    .closed(k.get("x").asBoolean())
-                    .build();
+            return parseListKlineUpdate(response, symbol, interval);
 
         } catch (Exception e) {
-            log.error("Failed to parse Kline update: {}", json, e);
-            return null;
+            log.error("Failed to fetch Kline data from exchange: {}", e.getMessage(), e);
+            return List.of(); // fallback rỗng
         }
+    }
+
+    private List<KlineUpdate> parseListKlineUpdate(String response, String symbol, String interval) {
+        List<KlineUpdate> result = new ArrayList<>();
+
+        try {
+            List<List<Object>> rawList = objectMapper.readValue(response, List.class);
+
+            for (List<Object> k : rawList) {
+                KlineUpdate kline = KlineUpdate.builder()
+                        .symbol(symbol)
+                        .interval(interval)
+                        .openTime(Instant.ofEpochMilli(((Number) k.get(0)).longValue()))
+                        .open(Double.parseDouble(k.get(1).toString()))
+                        .high(Double.parseDouble(k.get(2).toString()))
+                        .low(Double.parseDouble(k.get(3).toString()))
+                        .close(Double.parseDouble(k.get(4).toString()))
+                        .volume(Double.parseDouble(k.get(5).toString()))
+                        .closeTime(Instant.ofEpochMilli(((Number) k.get(6)).longValue()))
+                        .tradesCount(((Number) k.get(8)).intValue())
+                        .closed(true)
+                        .build();
+
+                result.add(kline);
+            }
+
+        } catch (Exception e) {
+            log.error("Failed to parse Kline response: {}", e.getMessage(), e);
+        }
+
+        return result;
     }
 }

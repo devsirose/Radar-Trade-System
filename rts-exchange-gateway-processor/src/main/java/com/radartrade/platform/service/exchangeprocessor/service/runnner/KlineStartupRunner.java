@@ -1,7 +1,7 @@
 package com.radartrade.platform.service.exchangeprocessor.service.runnner;
 
 import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
-import com.radartrade.platform.service.exchangeprocessor.service.client.KlineConsumer;
+import com.radartrade.platform.service.exchangeprocessor.service.client.KlineStreamConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.impl.KlineStreamProcessor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +30,11 @@ public class KlineStartupRunner implements ApplicationRunner {
         List<Symbol> symbols = symbolConsumer.getSymbols();
 
         for (int i = 0; i < symbols.size(); i += MAX_SUBSTREAM) {
-            KlineConsumer klineConsumer = new KlineConsumer(
+            KlineStreamConsumer klineStreamConsumer = new KlineStreamConsumer(
                     symbols.subList(i, Math.min((i + MAX_SUBSTREAM), symbols.size()))
             );
 
-            klineStreamProcessor.constructFluxKlineUpdates(klineConsumer.klineUpdateStream())
+            klineStreamProcessor.constructFluxKlineUpdates(klineStreamConsumer.klineUpdateStream())
                     .subscribe();
         }
     }
