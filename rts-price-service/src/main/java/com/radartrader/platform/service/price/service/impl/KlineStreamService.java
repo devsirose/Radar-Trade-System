@@ -5,6 +5,8 @@ import com.radartrader.platform.service.price.repository.KlineReactiveRepository
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.util.Locale;
+
 @Service
 public class KlineStreamService {
     private final KlineReactiveRepository klineReactiveRepository;
@@ -14,6 +16,6 @@ public class KlineStreamService {
     }
 
     public Flux<KlineUpdate> consumeKlineUpdate(String symbol, String interval, Integer limit) {
-        return klineReactiveRepository.getListPriceUpdate(symbol, interval, limit);
+        return klineReactiveRepository.getListPriceUpdate(symbol.toUpperCase(Locale.ROOT), interval, limit);
     }
 }
