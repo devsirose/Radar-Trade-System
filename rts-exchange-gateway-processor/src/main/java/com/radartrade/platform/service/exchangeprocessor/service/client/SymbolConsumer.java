@@ -35,7 +35,12 @@ public class SymbolConsumer {
     }
 
     public List<Symbol> getSymbols() {
-        return symbols;
+        return List.of("btcusdt", "ethusdt", "bnbusdt",
+                        "xrpusdt", "solusdt", "adausdt",
+                        "dogeusdt", "maticusdt", "ltcusdt",
+                        "linkusdt")
+                .stream().map(s -> new Symbol(s))
+                .collect(Collectors.toList());
     }
 
     private List<Symbol> initListSymbols() {
