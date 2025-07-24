@@ -8,8 +8,8 @@ migrateup:
 	migrate -path db/migration/ -database "postgresql://root:mysecretpassword@localhost:5432/account-service?sslmode=disable" -verbose up
 migratedown:
 	yes | migrate -path db/migration/ -database "postgresql://root:mysecretpassword@localhost:5432/account-service?sslmode=disable" -verbose down
-
 redis:
 	sudo docker exec -it redis bash
+wrk:
 
 .PHONY: postgresdb createdb dropdb migrateup migratedown redis
