@@ -25,9 +25,9 @@ public class KlineStreamService {
         );
         //fallback method
         return klineUpdateFlux.collectList()
-                .flatMapMany(dbList -> {
-                    if (dbList.size() >= limit) {
-                        return Flux.fromIterable(dbList);
+                .flatMapMany(klineUpdates -> {
+                    if (klineUpdates.size() >= limit) {
+                        return Flux.fromIterable(klineUpdates);
                     } else {
                         return klineConsumer.getFluxKlineUpdate(
                                 symbol,
@@ -35,6 +35,9 @@ public class KlineStreamService {
                                 limit
                         );
                     }
-                });
+                })
+                .sort( (t1, t2) ->
+                        t1.getCloseTime().compareTo(t2.getCloseTime())
+                );
     }
 }

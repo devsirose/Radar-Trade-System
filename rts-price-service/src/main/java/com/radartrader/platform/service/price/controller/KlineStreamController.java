@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 import java.util.Locale;
 
 @RestController
-@RequestMapping("/api/v1/kline")
+@RequestMapping("/api/v1/price/kline")
 public class KlineStreamController {
     private final KlineStreamService klineStreamService;
 
