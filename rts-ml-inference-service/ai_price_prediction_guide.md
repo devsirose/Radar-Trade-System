@@ -920,3 +920,40 @@ class Backtester:
 5. **Feature Importance Tracking**: Monitor feature contributions
 
 Hệ thống này cung cấp foundation solid cho AI-powered price prediction với real-time inference và proper model management. Bạn có thể bắt đầu implement từng component một cách tuần tự.
+
+
+
+
+Repository 1: ML Models & Training 📊
+Chức năng chính:
+
+Phát triển và huấn luyện các mô hình ML (LSTM, Random Forest, Gradient Boosting)
+Feature engineering và technical indicators
+Model registry với MLflow
+Backtesting và evaluation
+Export models để sử dụng trong production
+
+Tính năng nổi bật:
+
+Hybrid Model: Kết hợp LSTM + ensemble methods
+Advanced Feature Engineering: 50+ technical indicators
+Model Versioning: MLflow integration cho model management
+Comprehensive Training Pipeline: Automated training với validation
+Jupyter Notebooks: Để research và experimentation
+
+Repository 2: Streaming & Inference Service 🚀
+Chức năng chính:
+
+Real-time data streaming với Kafka
+Sentiment analysis từ news
+ML inference service
+WebSocket API cho real-time updates
+Monitoring và health checks
+
+Tính năng nổi bật:
+
+Real-time Processing: Kafka + Redis cho low-latency
+Scalable Architecture: Docker compose với microservices
+WebSocket Support: Real-time updates cho clients
+Comprehensive API: RESTful + WebSocket endpoints
+Production Ready: Health checks, monitoring, logging
