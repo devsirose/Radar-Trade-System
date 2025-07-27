@@ -39,7 +39,7 @@ public class SymbolConsumer {
                         "xrpusdt", "solusdt", "adausdt",
                         "dogeusdt", "maticusdt", "ltcusdt",
                         "linkusdt")
-                .stream().map(s -> new Symbol(s))
+                .stream().map(s -> new Symbol(s.toUpperCase(Locale.ROOT)))
                 .collect(Collectors.toList());
     }
 
