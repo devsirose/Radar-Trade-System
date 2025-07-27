@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -60,6 +61,12 @@ public class KlineStartupRunner implements ApplicationRunner {
                         .subscribe();
             }
         }
+    }
+
+    @Scheduled(fixedRate = 10 * 60 * 1000)
+    public void persitKlineUpdatesToDbTask() {
+        log.info("Get Kline updates from exchange and retrain model");
+        persistKlineUpdatesToDb();
     }
 
     @Override
