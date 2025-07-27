@@ -63,7 +63,7 @@ public class KlineStartupRunner implements ApplicationRunner {
         }
     }
 
-    @Scheduled(fixedRate = 10 * 60 * 1000)
+    @Scheduled(fixedRate = 1 * 60 * 1000)
     public void persitKlineUpdatesToDbTask() {
         log.info("Get Kline updates from exchange and retrain model");
         persistKlineUpdatesToDb();
