@@ -1,0 +1,14 @@
+<!-- src/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Tin tức</title></head>
+<body>
+  <h1>Danh sách tin tức</h1>
+  {% for article in articles %}
+    <h3>{{ article.title }}</h3>
+    <p>{{ article.content }}</p>
+    <strong>Sentiment:</strong> {{ article.sentiment }}
+    <hr>
+  {% endfor %}
+</body>
+</html>
