@@ -31,7 +31,6 @@
 		<module>rts-discovery-server</module>
 		<module>rts-price-service</module>
 		<module>rts-backtest-service</module>
-		<module>rts-ml-inference-service</module>
 		<module>rts-order-service</module>
 		<module>rts-order-book-service</module>
 		<module>rts-exchange-gateway-processor</module>
