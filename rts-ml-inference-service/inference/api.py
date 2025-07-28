@@ -86,7 +86,7 @@ def predict_stream():
                 data = scaler.transform(df[['close']])
                 x_input = np.array(data).reshape(1, SEQ_LEN, 1)
                 prediction = model.predict(x_input)
-                predicted_price = (float(scaler.inverse_transform(prediction)[0][0]) + get_realtime_price(symbol)) / 2
+                predicted_price = float(scaler.inverse_transform(prediction)[0][0])
 
                 payload = {
                     'symbol': symbol,
