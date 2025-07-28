@@ -97,7 +97,7 @@ def predict_stream():
             except Exception as e:
                 yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
-            time.sleep(0.5)
+            time.sleep(interval)
 
     return Response(generate(), mimetype='text/event-stream')
 
