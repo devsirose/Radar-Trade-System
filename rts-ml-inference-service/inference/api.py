@@ -60,7 +60,7 @@ def get_realtime_price(symbol):
     data = response.json()
     return float(data['price'])
 
-@app.route('/predict/stream', methods=['GET'])
+@app.route('api/v1/price/predict/stream', methods=['GET'])
 def predict_stream():
     symbol = request.args.get('symbol')
     interval = request.args.get('interval', '1m')  # default to 1m
