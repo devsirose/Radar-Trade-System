@@ -1,4 +1,4 @@
-package com.radartrade.platform.service.exchangeprocessor.domain;
+package com.radartrade.platform.service.common.domain.valueobject;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

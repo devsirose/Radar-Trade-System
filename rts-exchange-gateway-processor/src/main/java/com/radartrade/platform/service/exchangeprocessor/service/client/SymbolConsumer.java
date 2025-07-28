@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.radartrade.platform.service.common.constant.ErrorCode;
 import com.radartrade.platform.service.common.exception.AppException;
-import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
+import com.radartrade.platform.service.common.domain.valueobject.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.util.MapperUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

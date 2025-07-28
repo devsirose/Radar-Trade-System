@@ -1,6 +1,6 @@
 package com.radartrade.platform.service.exchangeprocessor.service.runnner;
 
-import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
+import com.radartrade.platform.service.common.domain.valueobject.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.service.client.PriceConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.impl.PricePubService;

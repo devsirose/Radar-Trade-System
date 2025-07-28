@@ -2,9 +2,9 @@ package com.radartrade.platform.service.exchangeprocessor.service.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.radartrade.platform.service.exchangeprocessor.domain.KlineInterval;
+import com.radartrade.platform.service.common.domain.valueobject.KlineInterval;
 import com.radartrade.platform.service.exchangeprocessor.domain.KlineUpdate;
-import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
+import com.radartrade.platform.service.common.domain.valueobject.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.util.MapperUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

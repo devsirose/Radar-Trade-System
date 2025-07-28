@@ -2,7 +2,7 @@ package com.radartrade.platform.service.exchangeprocessor.service.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.radartrade.platform.service.exchangeprocessor.domain.PriceUpdate;
-import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
+import com.radartrade.platform.service.common.domain.valueobject.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.util.MapperUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

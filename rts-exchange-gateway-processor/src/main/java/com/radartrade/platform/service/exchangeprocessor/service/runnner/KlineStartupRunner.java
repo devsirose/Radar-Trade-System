@@ -1,7 +1,7 @@
 package com.radartrade.platform.service.exchangeprocessor.service.runnner;
 
-import com.radartrade.platform.service.exchangeprocessor.domain.KlineInterval;
-import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
+import com.radartrade.platform.service.common.domain.valueobject.KlineInterval;
+import com.radartrade.platform.service.common.domain.valueobject.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.repository.KlineReactiveRepository;
 import com.radartrade.platform.service.exchangeprocessor.service.client.KlineConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
