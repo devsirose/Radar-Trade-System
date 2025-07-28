@@ -1,17 +1,14 @@
 package com.radartrade.platform.service.exchangeprocessor.service.runnner;
 
-import com.radartrade.platform.service.common.domain.valueobject.KlineInterval;
 import com.radartrade.platform.service.common.domain.valueobject.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.repository.KlineReactiveRepository;
-import com.radartrade.platform.service.exchangeprocessor.service.client.KlineConsumer;
+import com.radartrade.platform.service.exchangeprocessor.service.client.KlineStreamConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
-import com.radartrade.platform.service.exchangeprocessor.service.impl.KlineStreamProcessor;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,50 +20,30 @@ public class KlineStartupRunner implements ApplicationRunner {
 
     private final SymbolConsumer symbolConsumer;
     private final int MAX_SUBSTREAM = 100;
-    private final KlineStreamProcessor klineStreamProcessor;
-    private final KlineConsumer klineConsumer;
     private final int MAX_KLINE_LIMIT = 1000;
     private final KlineReactiveRepository klineReactiveRepository;
 
-    public KlineStartupRunner(SymbolConsumer symbolConsumer1, KlineStreamProcessor klineStreamProcessor, KlineConsumer klineConsumer, KlineReactiveRepository klineReactiveRepository) {
-        this.symbolConsumer = symbolConsumer1;
-        this.klineStreamProcessor = klineStreamProcessor;
-        this.klineConsumer = klineConsumer;
+    public KlineStartupRunner(SymbolConsumer symbolConsumer, KlineReactiveRepository klineReactiveRepository) {
+        this.symbolConsumer = symbolConsumer;
         this.klineReactiveRepository = klineReactiveRepository;
     }
-
     @PostConstruct
-    public void persistKlineUpdatesToDb() {
+    public void streamKlineUpdatesToDb() {
         List<Symbol> symbols = symbolConsumer.getSymbols();
-        List<KlineInterval> intervals = KlineInterval.allIntervals();
-
-        for (Symbol symbol : symbols) {
-            for (KlineInterval interval : intervals) {
-                klineConsumer.getFluxKlineUpdate(
-                                symbol.getName(),
-                                interval.getCode(),
-                                MAX_KLINE_LIMIT
-                        )
-                        .filterWhen(klineUpdate ->
-                                klineReactiveRepository
-                                        .existsKlineUpdatesBySymbolAndIntervalAndOpenTime(
-                                                klineUpdate.getSymbol(),
-                                                klineUpdate.getInterval(),
-                                                klineUpdate.getOpenTime()
-                                        )
-                                        .map(numberOfRow ->
-                                                numberOfRow > 0 ? false : true)
-                        )
-                        .flatMap(klineReactiveRepository::save)
-                        .subscribe();
-            }
-        }
-    }
-
-    @Scheduled(fixedRate = 1 * 60 * 1000)
-    public void persitKlineUpdatesToDbTask() {
-        log.info("Get Kline updates from exchange and retrain model");
-        persistKlineUpdatesToDb();
+        KlineStreamConsumer klineStreamConsumer =  new KlineStreamConsumer(symbols);
+        klineStreamConsumer.klineUpdateStream()
+                .filterWhen(klineUpdate ->
+                        klineReactiveRepository
+                                .existsKlineUpdatesBySymbolAndIntervalAndOpenTime(
+                                        klineUpdate.getSymbol(),
+                                        klineUpdate.getInterval(),
+                                        klineUpdate.getOpenTime()
+                                )
+                                .map(numberOfRow ->
+                                        numberOfRow > 0 ? false : true)
+                )
+                .flatMap(klineReactiveRepository::save)
+                .subscribe();
     }
 
     @Override

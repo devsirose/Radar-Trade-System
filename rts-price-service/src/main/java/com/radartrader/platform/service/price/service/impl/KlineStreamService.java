@@ -2,19 +2,19 @@ package com.radartrader.platform.service.price.service.impl;
 
 import com.radartrade.platform.service.exchangeprocessor.domain.KlineUpdate;
 import com.radartrade.platform.service.exchangeprocessor.repository.KlineReactiveRepository;
-import com.radartrade.platform.service.exchangeprocessor.service.client.KlineConsumer;
+import com.radartrade.platform.service.exchangeprocessor.service.client.KlineRestConsumer;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
 public class KlineStreamService {
     private final KlineReactiveRepository klineReactiveRepository;
-    private final KlineConsumer klineConsumer;
+    private final KlineRestConsumer klineRestConsumer;
 
     public KlineStreamService(KlineReactiveRepository klineReactiveRepository,
-                              KlineConsumer klineConsumer) {
+                              KlineRestConsumer klineRestConsumer) {
         this.klineReactiveRepository = klineReactiveRepository;
-        this.klineConsumer = klineConsumer;
+        this.klineRestConsumer = klineRestConsumer;
     }
 
     public Flux<KlineUpdate> consumeKlineUpdate(String symbol, String interval, Integer limit) {
@@ -29,7 +29,7 @@ public class KlineStreamService {
                     if (klineUpdates.size() >= limit) {
                         return Flux.fromIterable(klineUpdates);
                     } else {
-                        return klineConsumer.getFluxKlineUpdate(
+                        return klineRestConsumer.getFluxKlineUpdate(
                                 symbol,
                                 interval,
                                 limit

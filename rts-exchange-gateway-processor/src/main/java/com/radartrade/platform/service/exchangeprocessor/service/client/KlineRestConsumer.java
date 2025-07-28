@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class KlineConsumer {
+public class KlineRestConsumer {
 
     @Value("${exchange.api.rest.base-url}")
     private String BASE_URL;
@@ -27,7 +27,7 @@ public class KlineConsumer {
     private RestClient client;
     private final ObjectMapper objectMapper = MapperUtil.objectMapper();
 
-    public KlineConsumer() {
+    public KlineRestConsumer() {
     }
 
     @PostConstruct
