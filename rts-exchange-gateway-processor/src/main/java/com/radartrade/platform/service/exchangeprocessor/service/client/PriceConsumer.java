@@ -14,6 +14,7 @@ import reactor.core.publisher.Sinks;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -54,7 +55,7 @@ public class PriceConsumer {
 
     private String joinPriceStream() {
         return symbols.stream()
-                .map( symbol -> symbol.getName() + POST_FIX)
+                .map( symbol -> symbol.getName().toLowerCase(Locale.ROOT) + POST_FIX)
                 .collect(Collectors.joining("/"));
     }
 
