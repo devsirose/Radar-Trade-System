@@ -5,6 +5,8 @@ import lombok.Getter;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Enum representing supported Kline (candlestick) intervals.
@@ -19,16 +21,30 @@ public enum KlineInterval {
 
     private final String code;
     private final Duration duration;
+    private static final Map<String, Duration> CODE_TO_DURATION = new ConcurrentHashMap<>();
 
+    static {
+        for (KlineInterval interval : KlineInterval.values()) {
+            CODE_TO_DURATION.put(interval.code, interval.duration);
+        }
+    }
 
     KlineInterval(String code, Duration duration) {
         this.code = code;
         this.duration = duration;
     }
 
+    public static Duration getvalueOf(String code) {
+        return CODE_TO_DURATION.get(code);
+    }
+
     @Override
     public String toString() {
         return code;
+    }
+
+    public Duration getDuration() {
+        return duration;
     }
 
     public static List<KlineInterval> allIntervals() {

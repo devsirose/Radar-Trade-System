@@ -51,6 +51,11 @@ exchange:
   api:
     rest:
       base-url: https://api.binance.com
+
+kline:
+  cache:
+    max-size: 500
 my:
   runner:
     enabled: true
+

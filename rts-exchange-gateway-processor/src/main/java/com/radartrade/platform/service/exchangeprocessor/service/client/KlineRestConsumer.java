@@ -38,6 +38,7 @@ public class KlineRestConsumer {
     }
 
     public Flux<KlineUpdate> getFluxKlineUpdate(String symbol, String interval, Integer limit) {
+        symbol = symbol.toUpperCase();
         return Flux.fromIterable(
                 getListKlineUpdates(symbol, interval, limit)
         );
