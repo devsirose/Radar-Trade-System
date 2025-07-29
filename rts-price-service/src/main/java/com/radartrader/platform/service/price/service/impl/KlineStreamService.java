@@ -43,7 +43,7 @@ public class KlineStreamService {
      */
     public Flux<KlineUpdate> consumeAndCacheKlineUpdate(String symbol, String interval) {
         String key = KlineRedisKeyGenerator.generateKlineKey(symbol, interval);
-        Duration ttl = KlineInterval.getvalueOf(interval);
+
         ReactiveListOperations<String, KlineUpdate> redisListOps = redisOperations.opsForList();
 
         return redisListOps.size(key)
@@ -54,24 +54,27 @@ public class KlineStreamService {
                     }
 
                     log.info("Cache miss for key: {}, fetching from source...", key);
-                    return klineRestConsumer.getFluxKlineUpdate(symbol, interval, KlineCacheProperties.MAX_LIST_VALUE_SIZE)
-                            .switchIfEmpty(Flux.defer(() -> {
-                                log.warn("No data from getFluxKlineUpdate for {}-{}", symbol, interval);
-                                return Flux.empty();
-                            }))
-                            .sort(Comparator.comparing(KlineUpdate::getCloseTime))
-                            .collectList()
-                            .flatMapMany(klineList -> {
-                                if (klineList.isEmpty()) {
-                                    return Flux.empty();
-                                }
-                                return redisListOps.rightPushAll(key, klineList)
-                                        .then(redisOperations.expire(key, ttl))
-                                        .thenMany(Flux.fromIterable(klineList));
-                            });
+                    return cacheConsumer(symbol, interval, key);
                 });
     }
 
-
-
+    private Flux<KlineUpdate> cacheConsumer(String symbol, String interval, String key) {
+        ReactiveListOperations<String, KlineUpdate> redisListOps = redisOperations.opsForList();
+        Duration ttl = KlineInterval.getvalueOf(interval);
+        return klineRestConsumer.getFluxKlineUpdate(symbol, interval, KlineCacheProperties.MAX_LIST_VALUE_SIZE)
+                .switchIfEmpty(Flux.defer(() -> {
+                    log.warn("No data from KlineRestConsumer for {}:{}", symbol, interval);
+                    return Flux.empty();
+                }))
+                .sort(Comparator.comparing(KlineUpdate::getCloseTime))
+                .collectList()
+                .flatMapMany(klineList -> {
+                    if (klineList.isEmpty()) {
+                        return Flux.empty();
+                    }
+                    return redisListOps.rightPushAll(key, klineList)
+                            .then(redisOperations.expire(key, ttl))
+                            .thenMany(Flux.fromIterable(klineList));
+                });
+    }
 }

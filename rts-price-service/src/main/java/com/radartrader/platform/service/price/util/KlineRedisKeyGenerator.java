@@ -8,7 +8,7 @@ public class KlineRedisKeyGenerator {
     public static String generateKlineKey(String symbol, String interval) {
         return KLINE_PREFIX + SEPARATOR +
                 symbol.toUpperCase() + SEPARATOR +
-                interval.toUpperCase() + SEPARATOR;
+                interval ;
     }
 
 }
