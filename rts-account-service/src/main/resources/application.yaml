@@ -13,7 +13,7 @@ spring:
       connection-timeout: 30000
       pool-name: HikariPool
 server:
-  port: 8090
+  port: 8085
 
 management:
   endpoints:
