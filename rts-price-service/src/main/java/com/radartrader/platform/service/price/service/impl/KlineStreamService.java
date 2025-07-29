@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.time.Duration;
 import java.util.Comparator;
 
 @Service
@@ -41,28 +42,36 @@ public class KlineStreamService {
      * @return Flux<KlineUpdate>
      */
     public Flux<KlineUpdate> consumeAndCacheKlineUpdate(String symbol, String interval) {
-        ReactiveListOperations<String, KlineUpdate> redisListOps = redisOperations.opsForList();
         String key = KlineRedisKeyGenerator.generateKlineKey(symbol, interval);
+        Duration ttl = KlineInterval.getvalueOf(interval);
+        ReactiveListOperations<String, KlineUpdate> redisListOps = redisOperations.opsForList();
 
-        return klineRestConsumer.getFluxKlineUpdate(symbol, interval, KlineCacheProperties.MAX_LIST_VALUE_SIZE)
-                .switchIfEmpty(Flux.defer(() -> {
-                    log.warn("No data from getFluxKlineUpdate for {}-{}", symbol, interval);
-                    return Flux.empty();
-                }))
-                .doOnNext(k -> log.debug("Fetched Kline: {}", k))
-                .sort(Comparator.comparing(KlineUpdate::getCloseTime))
-                .collectList()
-                .doOnNext(list -> log.debug("Collected list size: {}", list.size()))
-                .flatMapMany(klineList -> {
-                    if (klineList.isEmpty()) {
-                        return Flux.empty();
+        return redisListOps.size(key)
+                .flatMapMany(size -> {
+                    if (size != null && size > 0) {
+                        log.info("Cache hit for key: {}", key);
+                        return redisListOps.range(key, 0, -1);
                     }
-                    return redisListOps.rightPushAll(key, klineList)
-                            .then(redisOperations.expire(key, KlineInterval.getvalueOf(interval)))
-                            .thenMany(Flux.fromIterable(klineList));
-                });
 
+                    log.info("Cache miss for key: {}, fetching from source...", key);
+                    return klineRestConsumer.getFluxKlineUpdate(symbol, interval, KlineCacheProperties.MAX_LIST_VALUE_SIZE)
+                            .switchIfEmpty(Flux.defer(() -> {
+                                log.warn("No data from getFluxKlineUpdate for {}-{}", symbol, interval);
+                                return Flux.empty();
+                            }))
+                            .sort(Comparator.comparing(KlineUpdate::getCloseTime))
+                            .collectList()
+                            .flatMapMany(klineList -> {
+                                if (klineList.isEmpty()) {
+                                    return Flux.empty();
+                                }
+                                return redisListOps.rightPushAll(key, klineList)
+                                        .then(redisOperations.expire(key, ttl))
+                                        .thenMany(Flux.fromIterable(klineList));
+                            });
+                });
     }
+
 
 
 }
