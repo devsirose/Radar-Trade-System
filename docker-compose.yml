@@ -6,3 +6,143 @@ services:
     image: redis:6.2
     ports:
       - 6379:6379
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-discovery-server:
+    image: devsirose/rts-discovery-server
+    container_name: rts-discovery-server
+    ports:
+      - 8761:8761
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://discovery-server:8761"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-api-gateway:
+    image: devsirose/rts-api-gateway
+    container_name: rts-api-gateway
+    ports:
+      - 8080:8080
+    depends_on:
+      - rts-discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+
+  rts-account-service:
+    image: devsirose/rts-account-service
+    container_name: rts-account-service
+    ports:
+      - 8085:8085
+    depends_on:
+      - rts-discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-order-service:
+    image: devsirose/rts-order-service
+    container_name: rts-order-service
+    ports:
+      - 8086:8086
+    depends_on:
+      - rts-discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-order-book-service:
+    image: devsirose/rts-order-book-service
+    container_name: rts-order-book-service
+    ports:
+      - 8087:8087
+    depends_on:
+      - rts-discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-payment-service:
+    image: devsirose/rts-payment-service
+    container_name: rts-payment-service
+    ports:
+      - 8088:8088
+    depends_on:
+      - rts-discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-price-service:
+    image: devsirose/rts-price-service
+    container_name: rts-price-service
+    ports:
+      - 8083:8083
+    depends_on:
+      - rts-discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-exchange-gateway-processor:
+    image: devsirose/rts-exchange-gateway-processor
+    container_name: rts-exchange-gateway-processor
+    ports:
+      - 8082:8082
+    depends_on:
+      - rts-discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-backtest-service:
+    image: devsirose/rts-backtest-service
+    container_name: rts-backtest-service
+    ports:
+      - 8089:8089
+    depends_on:
+      - rts-discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-ml-inference-service:
+    image: devsirose/rts-ml-inference-service
+    container_name: rts-ml-inference-service
+    ports:
+      - 5000:5000
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  rts-ws-gateway:
+    image: devsirose/rts-ws-gateway
+    container_name: rts-ws-gateway
+    ports:
+      - 8090:8090
+    depends_on:
+      - rts-discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
