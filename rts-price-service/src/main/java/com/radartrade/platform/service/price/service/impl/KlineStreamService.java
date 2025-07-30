@@ -1,11 +1,10 @@
-package com.radartrader.platform.service.price.service.impl;
+package com.radartrade.platform.service.price.service.impl;
 
 import com.radartrade.platform.service.common.domain.valueobject.KlineInterval;
-import com.radartrade.platform.service.exchangeprocessor.domain.KlineUpdate;
-import com.radartrade.platform.service.exchangeprocessor.repository.KlineReactiveRepository;
-import com.radartrade.platform.service.exchangeprocessor.service.client.KlineRestConsumer;
-import com.radartrader.platform.service.price.config.KlineCacheProperties;
-import com.radartrader.platform.service.price.util.KlineRedisKeyGenerator;
+import com.radartrade.platform.service.price.service.client.KlineRestConsumer;
+import com.radartrade.platform.service.price.config.KlineCacheProperties;
+import com.radartrade.platform.service.price.domain.KlineUpdate;
+import com.radartrade.platform.service.price.util.KlineRedisKeyGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveListOperations;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
@@ -18,14 +17,11 @@ import java.util.Comparator;
 @Service
 @Slf4j
 public class KlineStreamService {
-    private final KlineReactiveRepository klineReactiveRepository;
     private final KlineRestConsumer klineRestConsumer;
     private final ReactiveRedisOperations<String, KlineUpdate> redisOperations;
 
-    public KlineStreamService(KlineReactiveRepository klineReactiveRepository,
-                              KlineRestConsumer klineRestConsumer,
+    public KlineStreamService(KlineRestConsumer klineRestConsumer,
                               ReactiveRedisOperations<String, KlineUpdate> redisOperations) {
-        this.klineReactiveRepository = klineReactiveRepository;
         this.klineRestConsumer = klineRestConsumer;
         this.redisOperations = redisOperations;
     }

@@ -1,9 +1,8 @@
 version: '3'
 services:
   redis:
-    container_name: redis
-    hostname: redis
     image: redis:6.2
+    container_name: redis
     ports:
       - 6379:6379
     deploy:
@@ -11,8 +10,38 @@ services:
         limits:
           memory: 512M
 
+  price-service-db:
+    image: timescale/timescaledb:latest-pg15
+    container_name: price-service-db
+    environment:
+      POSTGRES_DB: market-price
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - 5431:5432
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    volumes:
+      - ./rts-exchange-gateway-processor/src/main/resources/db/schema:/docker-entrypoint-initdb.d
+      - price_service_db_data:/var/lib/postgresql/data
+
+  account-db:
+    image: postgres:15
+    container_name: account-service-db
+    environment:
+      POSTGRES_DB: account-service
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - 5432:5432
+    deploy:
+      resources:
+        limits:
+          memory: 512M
   rts-discovery-server:
-    image: devsirose/rts-discovery-server
+    image: devops22clc/rts-discovery-server
     container_name: rts-discovery-server
     ports:
       - 8761:8761
@@ -29,7 +58,7 @@ services:
           memory: 512M
 
   rts-api-gateway:
-    image: devsirose/rts-api-gateway
+    image: devops22clc/rts-api-gateway
     container_name: rts-api-gateway
     ports:
       - 8080:8080
@@ -42,7 +71,7 @@ services:
 
 
   rts-account-service:
-    image: devsirose/rts-account-service
+    image: devops22clc/rts-account-service
     container_name: rts-account-service
     ports:
       - 8085:8085
@@ -53,32 +82,8 @@ services:
         limits:
           memory: 512M
 
-  rts-order-service:
-    image: devsirose/rts-order-service
-    container_name: rts-order-service
-    ports:
-      - 8086:8086
-    depends_on:
-      - rts-discovery-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-
-  rts-order-book-service:
-    image: devsirose/rts-order-book-service
-    container_name: rts-order-book-service
-    ports:
-      - 8087:8087
-    depends_on:
-      - rts-discovery-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-
   rts-payment-service:
-    image: devsirose/rts-payment-service
+    image: devops22clc/rts-payment-service
     container_name: rts-payment-service
     ports:
       - 8088:8088
@@ -90,7 +95,7 @@ services:
           memory: 512M
 
   rts-price-service:
-    image: devsirose/rts-price-service
+    image: devops22clc/rts-price-service
     container_name: rts-price-service
     ports:
       - 8083:8083
@@ -102,7 +107,7 @@ services:
           memory: 512M
 
   rts-exchange-gateway-processor:
-    image: devsirose/rts-exchange-gateway-processor
+    image: devops22clc/rts-exchange-gateway-processor
     container_name: rts-exchange-gateway-processor
     ports:
       - 8082:8082
@@ -114,7 +119,7 @@ services:
           memory: 512M
 
   rts-backtest-service:
-    image: devsirose/rts-backtest-service
+    image: devops22clc/rts-backtest-service
     container_name: rts-backtest-service
     ports:
       - 8089:8089
@@ -125,24 +130,6 @@ services:
         limits:
           memory: 512M
 
-  rts-ml-inference-service:
-    image: devsirose/rts-ml-inference-service
-    container_name: rts-ml-inference-service
-    ports:
-      - 5000:5000
-    deploy:
-      resources:
-        limits:
-          memory: 512M
 
-  rts-ws-gateway:
-    image: devsirose/rts-ws-gateway
-    container_name: rts-ws-gateway
-    ports:
-      - 8090:8090
-    depends_on:
-      - rts-discovery-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
+volumes:
+  price_service_db_data:

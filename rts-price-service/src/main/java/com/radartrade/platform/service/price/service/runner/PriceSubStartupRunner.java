@@ -1,6 +1,6 @@
-package com.radartrader.platform.service.price.service.runner;
+package com.radartrade.platform.service.price.service.runner;
 
-import com.radartrader.platform.service.price.service.impl.PriceSubService;
+import com.radartrade.platform.service.price.service.impl.PriceSubService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

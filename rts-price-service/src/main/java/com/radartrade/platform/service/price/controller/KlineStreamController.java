@@ -1,7 +1,8 @@
-package com.radartrader.platform.service.price.controller;
+package com.radartrade.platform.service.price.controller;
 
-import com.radartrade.platform.service.exchangeprocessor.domain.KlineUpdate;
-import com.radartrader.platform.service.price.service.impl.KlineStreamService;
+
+import com.radartrade.platform.service.price.domain.KlineUpdate;
+import com.radartrade.platform.service.price.service.impl.KlineStreamService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +21,8 @@ public class KlineStreamController {
 
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<KlineUpdate> streamKlineUpdate(@RequestParam String symbol,
-                                      @RequestParam String interval,
-                                      @RequestParam(defaultValue = "500") Integer limit) {
+                                               @RequestParam String interval,
+                                               @RequestParam(defaultValue = "500") Integer limit) {
         return klineStreamService.consumeAndRetrieveKlineUpdate(symbol, interval, limit);
     }
     @GetMapping(value = "/stream/cacheable", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)

@@ -1,7 +1,8 @@
-package com.radartrader.platform.service.price.controller;
+package com.radartrade.platform.service.price.controller;
 
-import com.radartrade.platform.service.exchangeprocessor.domain.PriceUpdate;
-import com.radartrader.platform.service.price.service.impl.PriceSubService;
+
+import com.radartrade.platform.service.price.domain.PriceUpdate;
+import com.radartrade.platform.service.price.service.impl.PriceSubService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;

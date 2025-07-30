@@ -1,12 +1,9 @@
-package com.radartrader.platform.service.price;
+package com.radartrade.platform.service.price;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = {
-        "com.radartrader.platform.service.price",
-        "com.radartrade.platform.service.exchangeprocessor"
-})
+@SpringBootApplication
 public class RTSPriceServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(RTSPriceServiceApplication.class, args);

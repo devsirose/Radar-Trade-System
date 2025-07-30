@@ -1,4 +1,4 @@
-package com.radartrader.platform.service.price.util;
+package com.radartrade.platform.service.price.util;
 
 public class KlineRedisKeyGenerator {
 

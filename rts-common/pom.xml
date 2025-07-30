@@ -6,10 +6,11 @@
     <parent>
         <groupId>com.radartrade</groupId>
         <artifactId>radar-trade-system</artifactId>
-        <version>0.0.1</version>
+        <version>latest</version>
     </parent>
 
     <artifactId>rts-common</artifactId>
+    <packaging>jar</packaging>
 
     <properties>
     </properties>

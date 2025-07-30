@@ -1,9 +1,9 @@
-package com.radartrader.platform.service.price.config;
+package com.radartrade.platform.service.price.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.radartrade.platform.service.exchangeprocessor.domain.KlineUpdate;
+import com.radartrade.platform.service.price.domain.KlineUpdate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;

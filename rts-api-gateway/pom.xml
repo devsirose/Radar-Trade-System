@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.radartrade</groupId>
         <artifactId>radar-trade-system</artifactId>
-        <version>0.0.1</version>
+        <version>latest</version>
     </parent>
 
     <artifactId>rts-api-gateway</artifactId>
@@ -52,4 +52,21 @@
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal> <!-- Quan trọng -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
