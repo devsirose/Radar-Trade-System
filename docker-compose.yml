@@ -24,8 +24,8 @@ services:
         limits:
           memory: 512M
     volumes:
-      - ./rts-exchange-gateway-processor/src/main/resources/db/schema:/docker-entrypoint-initdb.d
-      - price_service_db_data:/var/lib/postgresql/data
+      - ./rts-exchange-gateway-processor/src/main/resources/db/schema/:/docker-entrypoint-initdb.d/
+      - price_service_db_data:${POSTGRESQL_VOLUME_DIR}/data
 
   account-db:
     image: postgres:15
