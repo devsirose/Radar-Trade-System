@@ -1,8 +1,11 @@
 spring:
   application:
     name: backtest-service
+  config:
+    activate:
+      on-profile: default
 server:
-  port: 8089
+  port: 8085
 
 management:
   endpoints:
@@ -37,3 +40,13 @@ eureka:
     fetch-registry: true
     service-url:
       default-zone: http://localhost:8761/eureka/
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+eureka:
+  client:
+    service-url:
+      default-zone: http://rts-discovery-server:8761/eureka/

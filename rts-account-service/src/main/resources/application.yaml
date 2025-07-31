@@ -53,3 +53,17 @@ info:
     name: account-service
     description: rts-account-service
     version: 1.0.0
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://account-db:5432/account-service?sslmode=disable
+    username: root
+    password: mysecretpassword
+eureka:
+  client:
+    service-url:
+      default-zone: http://rts-discovery-server:8761/eureka/

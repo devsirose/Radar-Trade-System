@@ -1,6 +1,9 @@
 spring:
   application:
     name: api-gateway
+  config:
+    activate:
+      on-profile: default
   cloud:
     gateway:
       discovery:
@@ -41,4 +44,14 @@ info:
     name: api-gateway
     description: rts-api-gateway
     version: 1.0.0
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+eureka:
+  client:
+    service-url:
+      default-zone: http://rts-discovery-server:8761/eureka/
 

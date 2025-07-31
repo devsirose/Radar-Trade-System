@@ -1,6 +1,9 @@
 spring:
   application:
-    name: exchange-processor
+    name: exchange-gateway-processor
+  config:
+    activate:
+      on-profile: default
   r2dbc:
     url: r2dbc:postgresql://localhost:5431/market-price?sslmode=disable
     password: mysecretpassword
@@ -55,3 +58,21 @@ exchange:
 my:
   runner:
     enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  r2dbc:
+    url: r2dbc:postgresql://price-service-db:5432/market-price?sslmode=disable
+    username: root
+    password: mysecretpassword
+  data:
+    redis:
+      host: redis
+      port: 6379
+eureka:
+  client:
+    service-url:
+      default-zone: http://rts-discovery-server:8761/eureka/
