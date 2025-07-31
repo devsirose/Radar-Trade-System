@@ -1,10 +1,6 @@
 spring:
   application:
     name: payment-service
-  config:
-    activate:
-      on-profile: default
-
 server:
   port: 8084
 

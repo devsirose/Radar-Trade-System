@@ -1,11 +1,8 @@
 spring:
   application:
     name: backtest-service
-  config:
-    activate:
-      on-profile: default
 server:
-  port: 8085
+  port: 8086
 
 management:
   endpoints:

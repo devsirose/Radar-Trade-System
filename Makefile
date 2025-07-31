@@ -20,7 +20,7 @@ docker-build:
 	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-account-service --build-arg VERSION=latest --build-arg EXPOSED_PORT=8085 --platform linux/amd64 --push -t devops22clc/rts-account-service rts-account-service && \
 	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-price-service --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8083 --platform linux/amd64 --push -t devops22clc/rts-price-service rts-price-service && \
 	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-payment-service --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8084 --platform linux/amd64 --push -t devops22clc/rts-payment-service rts-payment-service && \
-	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-backtest-service --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8085 --platform linux/amd64 --push -t devops22clc/rts-backtest-service rts-backtest-service && \
+	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-backtest-service --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8086 --platform linux/amd64 --push -t devops22clc/rts-backtest-service rts-backtest-service && \
 	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-exchange-gateway-processor --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8082 --platform linux/amd64 --push -t devops22clc/rts-exchange-gateway-processor rts-exchange-gateway-processor
 
 .PHONY: postgresdb createdb dropdb migrateup migratedown redis

@@ -92,7 +92,7 @@ services:
     image: devops22clc/rts-payment-service
     container_name: rts-payment-service
     ports:
-      - 8088:8088
+      - 8084:8084
     depends_on:
       - rts-discovery-server
     deploy:
@@ -134,7 +134,7 @@ services:
     image: devops22clc/rts-backtest-service
     container_name: rts-backtest-service
     ports:
-      - 8089:8089
+      - 8086:8086
     depends_on:
       - rts-discovery-server
     deploy:
