@@ -49,6 +49,6 @@ spring:
       on-profile: docker
 eureka:
   client:
-    service-url:
-      default-zone: http://rts-discovery-server:8761/eureka/
+    serviceUrl:
+      defaultZone: http://discovery-server:8761/eureka/
 

@@ -25,7 +25,7 @@ services:
           memory: 512M
     volumes:
       - ./rts-exchange-gateway-processor/src/main/resources/db/schema/:/docker-entrypoint-initdb.d/
-      - price_service_db_data:${POSTGRESQL_VOLUME_DIR}/data
+      - price_service_db_data:/var/lib/postgresql/data
 
   account-db:
     image: postgres:15
@@ -40,9 +40,11 @@ services:
       resources:
         limits:
           memory: 512M
-  rts-discovery-server:
+    volumes:
+      - account_service_db_data:/var/lib/postgresql/data
+  discovery-server:
     image: devops22clc/rts-discovery-server
-    container_name: rts-discovery-server
+    container_name: discovery-server
     ports:
       - 8761:8761
     depends_on:
@@ -59,42 +61,43 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
 
-  rts-api-gateway:
+  api-gateway:
     image: devops22clc/rts-api-gateway
-    container_name: rts-api-gateway
+    container_name: api-gateway
     ports:
       - 8080:8080
     depends_on:
-      - rts-discovery-server
+      - discovery-server
     deploy:
       resources:
         limits:
           memory: 512M
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://rts-discovery-server:8761/eureka/
 
-
-  rts-account-service:
+  account-service:
     image: devops22clc/rts-account-service
-    container_name: rts-account-service
+    container_name: account-service
     ports:
       - 8085:8085
     depends_on:
-      - rts-discovery-server
+      - discovery-server
     deploy:
       resources:
         limits:
           memory: 512M
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://rts-discovery-server:8761/eureka/
 
-  rts-payment-service:
+  payment-service:
     image: devops22clc/rts-payment-service
-    container_name: rts-payment-service
+    container_name: payment-service
     ports:
       - 8084:8084
     depends_on:
-      - rts-discovery-server
+      - discovery-server
     deploy:
       resources:
         limits:
@@ -102,13 +105,13 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
 
-  rts-price-service:
+  price-service:
     image: devops22clc/rts-price-service
-    container_name: rts-price-service
+    container_name: price-service
     ports:
       - 8083:8083
     depends_on:
-      - rts-discovery-server
+      - discovery-server
     deploy:
       resources:
         limits:
@@ -116,13 +119,13 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
 
-  rts-exchange-gateway-processor:
+  exchange-gateway-processor:
     image: devops22clc/rts-exchange-gateway-processor
-    container_name: rts-exchange-gateway-processor
+    container_name: exchange-gateway-processor
     ports:
       - 8082:8082
     depends_on:
-      - rts-discovery-server
+      - discovery-server
     deploy:
       resources:
         limits:
@@ -130,13 +133,13 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
 
-  rts-backtest-service:
+  backtest-service:
     image: devops22clc/rts-backtest-service
-    container_name: rts-backtest-service
+    container_name: backtest-service
     ports:
       - 8086:8086
     depends_on:
-      - rts-discovery-server
+      - discovery-server
     deploy:
       resources:
         limits:
@@ -147,3 +150,4 @@ services:
 
 volumes:
   price_service_db_data:
+  account_service_db_data:
