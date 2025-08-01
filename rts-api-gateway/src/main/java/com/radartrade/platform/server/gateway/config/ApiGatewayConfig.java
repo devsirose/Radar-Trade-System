@@ -34,7 +34,14 @@ public class ApiGatewayConfig {
      */
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
-        return builder.routes().build();
+        return builder.routes()
+                .route("account-service", r -> r
+                        .path("/api/v1/account/**")
+                        .uri("lb://account-service"))
+                .route("price-service", r -> r
+                        .path("/api/v1/price/**")
+                        .uri("lb://price-service"))
+                .build();
     }
 
 }
