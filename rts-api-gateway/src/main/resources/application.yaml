@@ -47,6 +47,11 @@ spring:
   config:
     activate:
       on-profile: docker
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://auth-server:7080/realms/master/protocol/openid-connect/certs
 eureka:
   client:
     serviceUrl:
