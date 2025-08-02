@@ -20,11 +20,15 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .authorizeExchange(exchange -> exchange
-                        .anyExchange().permitAll()
+                        .pathMatchers("/public/**",
+                                "/login/**",
+                                "/context",
+                                "/logout/**",
+                                "/actuator/**",
+                                "/callback").permitAll()
+                        .anyExchange().authenticated()
                 )
-                .csrf(csrfSpec -> csrfSpec
-                        .disable()
-                )
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(grantedAuthoritiesExtractor()))
                 )

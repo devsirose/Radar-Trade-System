@@ -29,6 +29,8 @@ public class KeycloakRoleConverter  implements Converter<Jwt, Collection<Granted
     }
 
     private String normalizeRoleName(String role) {
+        role = role.toLowerCase();
+        log.trace("Normalizing role: {}", role);
         if (role.startsWith("ROLE_"))
             return role;
         return new StringBuilder().append("ROLE_").append(role).toString();
