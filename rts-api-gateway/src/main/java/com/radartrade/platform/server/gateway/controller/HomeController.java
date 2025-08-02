@@ -6,9 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/public")
 public class HomeController {
-    @GetMapping
+
+    @GetMapping("/home")
     public ResponseEntity<String> home() {
         return  ResponseEntity.ok("Home Page");
     }

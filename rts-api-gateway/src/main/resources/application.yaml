@@ -9,9 +9,18 @@ spring:
           lower-case-service-id: true
   security:
     oauth2:
+#      client:
+#        registration:
+#          keycloak:
+#            client-id: rts-call-center-ac
+#            client-secret: tjkVejU6tAm3vZDJYDBABjvPEwZH0nxs
+#        provider:
+#          keycloak:
+#            issuer-uri: http://localhost:7080/realms/master
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:7080/realms/master/protocol/openid-connect/certs
+
 server:
   port: 8080
 
@@ -54,6 +63,8 @@ token:
         client-id: rts-call-center-ac
         client-secret: tjkVejU6tAm3vZDJYDBABjvPEwZH0nxs
         redirect-uri: http://localhost:8080/callback
+        login-url: http://localhost:7080/realms/master/protocol/openid-connect/auth
+        logout-url: http://localhost:7080/realms/master/protocol/openid-connect/logout
 ---
 spring:
   config:
