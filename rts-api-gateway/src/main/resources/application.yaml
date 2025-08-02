@@ -80,3 +80,13 @@ eureka:
     serviceUrl:
       defaultZone: http://discovery-server:8761/eureka/
 
+token:
+  exchange:
+    provider:
+      keycloak:
+        endpoint: http://auth-server:7080/realms/master/protocol/openid-connect/token
+        client-id: rts-call-center-ac
+        client-secret: tjkVejU6tAm3vZDJYDBABjvPEwZH0nxs
+        redirect-uri: http://auth-server:8080/callback
+        login-url: http://auth-server:7080/realms/master/protocol/openid-connect/auth
+        logout-url: http://auth-server:7080/realms/master/protocol/openid-connect/logout
