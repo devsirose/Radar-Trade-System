@@ -1,65 +1,79 @@
 import os
-import time
 import json
+import time
 import pickle
 import numpy as np
+import redis
 import pandas as pd
-import psycopg2
 import requests
 
-from flask import Flask, request, jsonify, Response
+from flask import Flask, Response, request, jsonify
+from keras.models import load_model as keras_load_model
+from sklearn.preprocessing import MinMaxScaler
 
 app = Flask(__name__)
 
-DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5431,
-    'dbname': 'market-price',
-    'user': 'root',
-    'password': 'mysecretpassword'
-}
+# --- Config ---
+SEQ_LEN = 60  # số nến cho mỗi lần dự đoán
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+redis_client = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=False)
 
-SEQ_LEN = 500
-
+# --- Load model ---
 def load_model(symbol):
-    path = f"../models/models/{symbol}/model.pkl/model.pkl"
+    path = os.path.join(os.path.dirname(__file__), f"../models/models/{symbol}/model.pkl")
     if not os.path.exists(path):
         raise FileNotFoundError(f"Model not found for symbol: {symbol}")
     with open(path, 'rb') as f:
         return pickle.load(f)
 
 def load_scaler(symbol):
-    path = f"../models/models/{symbol}/scaler.pkl/scaler.pkl"
+    path = os.path.join(os.path.dirname(__file__), f"../models/models/{symbol}/scaler.pkl")
     if not os.path.exists(path):
         raise FileNotFoundError(f"Scaler not found for symbol: {symbol}")
     with open(path, 'rb') as f:
         return pickle.load(f)
 
-def fetch_latest(symbol, interval):
-    conn = psycopg2.connect(**DB_CONFIG)
-    query = """
-        SELECT * FROM kline 
-        WHERE symbol = %s AND interval = %s
-        ORDER BY open_time DESC 
-        LIMIT %s
-    """
-    df = pd.read_sql(query, conn, params=(symbol, interval, SEQ_LEN))
-    conn.close()
-    df = df.sort_values('open_time')
-    return df
+# --- Fetch nến từ Binance ---
+def fetch_latest(symbol, interval, limit=SEQ_LEN):
+    url = f'https://api.binance.com/api/v3/klines'
+    params = {
+        'symbol': symbol.upper(),
+        'interval': interval,
+        'limit': limit
+    }
 
-def get_realtime_price(symbol):
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        df = pd.DataFrame(data, columns=[
+            'timestamp', 'open', 'high', 'low', 'close',
+            'volume', 'close_time', 'quote_asset_volume',
+            'number_of_trades', 'taker_buy_base_vol',
+            'taker_buy_quote_vol', 'ignore'
+        ])
+        df['close'] = df['close'].astype(float)
+        return df
+    except Exception as e:
+        print(f"[ERROR] Failed to fetch candles: {e}")
+        return pd.DataFrame()
 
-    url = f"https://api.binance.com/api/v3/ticker/price"
-    params = {"symbol": symbol.upper()}
+def interval_to_ttl(interval: str) -> int:
+    unit = interval[-1]
+    value = int(interval[:-1])
 
-    response = requests.get(url, params=params)
-    if response.status_code != 200:
-        raise Exception(f"Failed to fetch price from Binance: {response.text}")
+    if unit == 'm':  # minutes
+        return value * 60
+    elif unit == 'h':  # hours
+        return value * 60 * 60
+    elif unit == 'd':  # days
+        return value * 60 * 60 * 24
+    else:
+        raise ValueError(f"Unsupported interval unit: {unit}")
 
-    data = response.json()
-    return float(data['price'])
 
+# --- API dự đoán giá với cache Redis ---
 @app.route('/api/v1/price/predict/stream', methods=['GET'])
 def predict_stream():
     symbol = request.args.get('symbol')
@@ -67,6 +81,8 @@ def predict_stream():
 
     if not symbol:
         return jsonify({'error': 'Missing symbol parameter'}), 400
+
+    redis_key = f'kline.updates:predict:{symbol.lower()}:{interval}'
 
     try:
         model = load_model(symbol)
@@ -77,10 +93,21 @@ def predict_stream():
     def generate():
         while True:
             try:
-                df = fetch_latest(symbol, interval)
+                # 1. Check Redis cache
+                cached_data = redis_client.get(redis_key)
+                if cached_data:
+                    print(f"[CACHE HIT] key={redis_key}")
+                    yield f"data: {cached_data.decode()}\n\n"
+                    time.sleep(30)
+                    continue
+                else:
+                    print(f"[CACHE MISS] key={redis_key}")
+
+                # 2. Nếu không có trong Redis → fetch + predict
+                df = fetch_latest(symbol, interval, SEQ_LEN)
                 if df.empty:
                     yield f"data: {json.dumps({'error': 'Empty dataframe'})}\n\n"
-                    time.sleep(1)
+                    time.sleep(30)
                     continue
 
                 data = scaler.transform(df[['close']])
@@ -90,9 +117,18 @@ def predict_stream():
 
                 payload = {
                     'symbol': symbol,
-                    'next_price': predicted_price
+                    'interval': interval,
+                    'next_price': predicted_price,
+                    'timestamp': int(time.time() * 1000)
                 }
-                yield f"data: {json.dumps(payload)}\n\n"
+
+                payload_json = json.dumps(payload)
+
+                ttl = interval_to_ttl(interval)
+
+                redis_client.setex(redis_key, ttl, payload_json)
+
+                yield f"data: {payload_json}\n\n"
 
             except Exception as e:
                 yield f"data: {json.dumps({'error': str(e)})}\n\n"
@@ -101,5 +137,6 @@ def predict_stream():
 
     return Response(generate(), mimetype='text/event-stream')
 
+# --- Main ---
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8084)
+    app.run(host='0.0.0.0', port=8081, debug=True)
