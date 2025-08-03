@@ -1,9 +1,9 @@
 package com.radartrade.platform.service.price.service.impl;
 
 import com.radartrade.platform.service.common.domain.valueobject.KlineInterval;
-import com.radartrade.platform.service.price.service.client.KlineRestConsumer;
 import com.radartrade.platform.service.price.config.KlineCacheProperties;
 import com.radartrade.platform.service.price.domain.KlineUpdate;
+import com.radartrade.platform.service.price.service.client.KlineRestConsumer;
 import com.radartrade.platform.service.price.util.KlineRedisKeyGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveListOperations;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
-import java.util.Comparator;
 
 @Service
 @Slf4j
@@ -62,7 +61,7 @@ public class KlineStreamService {
                     log.warn("No data from KlineRestConsumer for {}:{}", symbol, interval);
                     return Flux.empty();
                 }))
-                .sort(Comparator.comparing(KlineUpdate::getCloseTime))
+//                .sort(Comparator.comparing(KlineUpdate::getCloseTime))
                 .collectList()
                 .flatMapMany(klineList -> {
                     if (klineList.isEmpty()) {
