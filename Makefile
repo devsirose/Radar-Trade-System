@@ -21,6 +21,7 @@ docker-build:
 	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-price-service --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8083 --platform linux/amd64 --push -t devops22clc/rts-price-service rts-price-service && \
 	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-payment-service --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8084 --platform linux/amd64 --push -t devops22clc/rts-payment-service rts-payment-service && \
 	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-backtest-service --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8086 --platform linux/amd64 --push -t devops22clc/rts-backtest-service rts-backtest-service && \
-	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-exchange-gateway-processor --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8082 --platform linux/amd64 --push -t devops22clc/rts-exchange-gateway-processor rts-exchange-gateway-processor
+	docker build -f Dockerfile --build-arg ARTIFACT_NAME=rts-exchange-gateway-processor --build-arg VERSION=latest  --build-arg EXPOSED_PORT=8082 --platform linux/amd64 --push -t devops22clc/rts-exchange-gateway-processor rts-exchange-gateway-processor && \
+	cd rts-ml-inference-service && docker build -f Dockerfile --push -t devops22clc/rts-ml-inference-service .
 
 .PHONY: postgresdb createdb dropdb migrateup migratedown redis

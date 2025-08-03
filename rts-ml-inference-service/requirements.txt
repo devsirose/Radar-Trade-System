@@ -14,3 +14,4 @@ flask_eureka
 python-dotenv~=1.1.1
 redis
 python-binance
+tensorflow

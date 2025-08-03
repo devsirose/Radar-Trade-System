@@ -177,14 +177,15 @@ services:
     volumes:
       - ./rts-api-gateway/src/main/resources/auth-server-db/h2/:/opt/keycloak/data/h2/
   ml-inference-service:
-    image: devops22clc/ml-inference-service
+    image: devops22clc/rts-ml-inference-service
     container_name: ml-inference-service
+    depends_on:
+      - discovery-server
+      - redis
     env_file:
       - ./rts-ml-inference-service/.env.docker
     ports:
       - "8081:8081"
-    depends_on:
-      - price-service-db
 
 volumes:
   price_service_db_data:

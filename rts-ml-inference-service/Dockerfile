@@ -13,5 +13,4 @@ COPY . .
 
 EXPOSE 8081
 
-# Chạy app FastAPI
-CMD ["uvicorn", "inference.api:app", "--host", "0.0.0.0", "--port", "8081"]
+CMD ["python", "inference/api.py"]
