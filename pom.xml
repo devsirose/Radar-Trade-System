@@ -32,7 +32,8 @@
 <!--		<module>rts-order-service</module>-->
 <!--		<module>rts-order-book-service</module>-->
 		<module>rts-exchange-gateway-processor</module>
-	</modules>
+<!--        <module>rts-notification-service</module>-->
+    </modules>
 	<scm>
 		<connection/>
 		<developerConnection/>

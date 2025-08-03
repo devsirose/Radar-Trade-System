@@ -106,93 +106,98 @@ Develop a reliable, secure payment system to manage subscriptions and transactio
 
 #### Core Entities
 ```sql
--- Users Table
-users {
-  id: UUID PRIMARY KEY
-  email: VARCHAR UNIQUE NOT NULL
-  password_hash: VARCHAR NOT NULL
-  first_name: VARCHAR
-  last_name: VARCHAR
-  phone: VARCHAR
-  country_code: VARCHAR(2)
-  created_at: TIMESTAMP
-  updated_at: TIMESTAMP
-  status: ENUM('active', 'inactive', 'suspended')
-}
+-- ENUM types
+CREATE TYPE billing_cycle_type AS ENUM ('monthly', 'quarterly', 'yearly');
+CREATE TYPE subscription_status AS ENUM ('active', 'past_due', 'cancelled', 'expired');
+CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'chargeback');
+CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'cancelled');
+CREATE TYPE invoice_status AS ENUM ('draft', 'open', 'paid', 'void', 'uncollectible');
+CREATE TYPE payment_method_type AS ENUM ('card', 'bank_account', 'wallet');
+CREATE TYPE plan_status AS ENUM ('active', 'inactive');
+
+-- Users
+CREATE TABLE users (
+                     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                     email VARCHAR UNIQUE NOT NULL,
+                     password VARCHAR NOT NULL,
+                     first_name VARCHAR,
+                     last_name VARCHAR,
+                     phone VARCHAR,
+                     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Subscription Plans
-subscription_plans {
-  id: UUID PRIMARY KEY
-  name: VARCHAR NOT NULL
-  description: TEXT
-  price: DECIMAL(10,2) NOT NULL
-  currency: VARCHAR(3) NOT NULL
-  billing_cycle: ENUM('monthly', 'quarterly', 'yearly')
-  trial_days: INTEGER DEFAULT 0
-  features: JSONB
-  status: ENUM('active', 'inactive')
-  created_at: TIMESTAMP
-}
+CREATE TABLE subscription_plans (
+                                  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                  name VARCHAR NOT NULL,
+                                  description TEXT,
+                                  price DECIMAL(10,2) NOT NULL,
+                                  currency VARCHAR(3) NOT NULL,
+                                  billing_cycle billing_cycle_type,
+                                  trial_days INTEGER DEFAULT 0,
+                                  status plan_status DEFAULT 'active',
+                                  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
 
 -- User Subscriptions
-subscriptions {
-  id: UUID PRIMARY KEY
-  user_id: UUID REFERENCES users(id)
-  plan_id: UUID REFERENCES subscription_plans(id)
-  status: ENUM('trial', 'active', 'past_due', 'cancelled', 'expired')
-  current_period_start: TIMESTAMP
-  current_period_end: TIMESTAMP
-  trial_end: TIMESTAMP
-  cancelled_at: TIMESTAMP
-  created_at: TIMESTAMP
-  updated_at: TIMESTAMP
-}
+CREATE TABLE subscriptions (
+                             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                             user_id UUID REFERENCES users(id),
+                             plan_id UUID REFERENCES subscription_plans(id),
+                             status subscription_status DEFAULT 'active',
+                             current_period_start TIMESTAMPTZ,
+                             current_period_end TIMESTAMPTZ,
+                             cancelled_at TIMESTAMPTZ,
+                             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Payment Methods
-payment_methods {
-  id: UUID PRIMARY KEY
-  user_id: UUID REFERENCES users(id)
-  type: ENUM('card', 'bank_account', 'wallet')
-  provider: VARCHAR (stripe, paypal, etc.)
-  provider_id: VARCHAR
-  last4: VARCHAR(4)
-  expiry_month: INTEGER
-  expiry_year: INTEGER
-  is_default: BOOLEAN DEFAULT FALSE
-  created_at: TIMESTAMP
-}
+CREATE TABLE payment_methods (
+                               id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                               user_id UUID REFERENCES users(id),
+                               type payment_method_type NOT NULL,
+                               provider VARCHAR,
+                               provider_id VARCHAR,
+                               last4 VARCHAR(4),
+                               expiry_month INTEGER,
+                               expiry_year INTEGER,
+                               created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Transactions
-transactions {
-  id: UUID PRIMARY KEY
-  user_id: UUID REFERENCES users(id)
-  subscription_id: UUID REFERENCES subscriptions(id)
-  payment_method_id: UUID REFERENCES payment_methods(id)
-  amount: DECIMAL(10,2) NOT NULL
-  currency: VARCHAR(3) NOT NULL
-  type: ENUM('payment', 'refund', 'chargeback')
-  status: ENUM('pending', 'completed', 'failed', 'cancelled')
-  gateway: VARCHAR
-  gateway_transaction_id: VARCHAR
-  failure_reason: TEXT
-  processed_at: TIMESTAMP
-  created_at: TIMESTAMP
-}
+CREATE TABLE transactions (
+                            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                            user_id UUID REFERENCES users(id),
+                            subscription_id UUID REFERENCES subscriptions(id),
+                            payment_method_id UUID REFERENCES payment_methods(id),
+                            amount DECIMAL(10,2) NOT NULL,
+                            currency VARCHAR(3) NOT NULL,
+                            type transaction_type NOT NULL,
+                            status transaction_status NOT NULL DEFAULT 'pending',
+                            gateway VARCHAR,
+                            gateway_transaction_id VARCHAR,
+                            failure_reason TEXT,
+                            processed_at TIMESTAMPTZ,
+                            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Invoices
-invoices {
-  id: UUID PRIMARY KEY
-  subscription_id: UUID REFERENCES subscriptions(id)
-  invoice_number: VARCHAR UNIQUE
-  amount_subtotal: DECIMAL(10,2)
-  tax_amount: DECIMAL(10,2)
-  amount_total: DECIMAL(10,2)
-  currency: VARCHAR(3)
-  status: ENUM('draft', 'open', 'paid', 'void', 'uncollectible')
-  due_date: DATE
-  paid_at: TIMESTAMP
-  created_at: TIMESTAMP
-}
+CREATE TABLE invoices (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        subscription_id UUID REFERENCES subscriptions(id),
+                        invoice_number VARCHAR UNIQUE NOT NULL,
+                        amount_subtotal DECIMAL(10,2),
+                        tax_amount DECIMAL(10,2),
+                        amount_total DECIMAL(10,2),
+                        currency VARCHAR(3),
+                        status invoice_status DEFAULT 'draft',
+                        due_date DATE,
+                        paid_at TIMESTAMPTZ,
+                        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
 ```
 
 ### 3.3 API Specifications
