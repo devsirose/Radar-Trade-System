@@ -5,6 +5,16 @@
 ### Objective
 Develop a reliable, secure payment system to manage subscriptions and transactions with high availability and compliance standards.
 
+###Key Takeaways:
+
+Saga Pattern: Cho distributed transactions
+Outbox Pattern: Đảm bảo event consistency
+Retry với Exponential Backoff: Xử lý transient failures
+Circuit Breaker: Prevent cascade failures
+Idempotency: Đảm bảo operations an toàn khi retry
+Dead Letter Queue: Handle persistent failure
+
+
 ### Scope
 - Subscription lifecycle management
 - One-time and recurring payment processing
@@ -520,3 +530,4 @@ Dunning Management:
 - **Vendor Lock-in**: Multi-cloud and vendor-agnostic design
 - **Data Loss**: Comprehensive backup and disaster recovery
 - **Service Dependencies**: Circuit breakers and graceful degradation
+
