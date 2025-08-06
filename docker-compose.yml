@@ -1,8 +1,193 @@
 version: '3'
 services:
   redis:
-    container_name: redis
-    hostname: redis
     image: redis:6.2
+    container_name: redis
     ports:
       - 6379:6379
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  price-service-db:
+    image: timescale/timescaledb:latest-pg15
+    container_name: price-service-db
+    environment:
+      POSTGRES_DB: market-price
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - 5431:5432
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    volumes:
+      - ./rts-exchange-gateway-processor/src/main/resources/db/schema/:/docker-entrypoint-initdb.d/
+      - price_service_db_data:/var/lib/postgresql/data
+
+  account-db:
+    image: postgres:15
+    container_name: account-service-db
+    environment:
+      POSTGRES_DB: account-service
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - 5432:5432
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    volumes:
+      - account_service_db_data:/var/lib/postgresql/data
+
+  payment-service-db:
+    image: postgres:15
+    container_name: payment-service-db
+    environment:
+      POSTGRES_DB: payment-service
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - 5430:5432
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    volumes:
+      - ./rts-payment-service/src/main/resources/db/schema/:/docker-entrypoint-initdb.d/
+      - payment_service_db_data:/var/lib/postgresql/data
+
+  discovery-server:
+    image: devops22clc/rts-discovery-server
+    container_name: discovery-server
+    ports:
+      - 8761:8761
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://discovery-server:8761"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  api-gateway:
+    image: devops22clc/rts-api-gateway
+    container_name: api-gateway
+    ports:
+      - 8080:8080
+    depends_on:
+      - discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://rts-discovery-server:8761/eureka/
+
+  account-service:
+    image: devops22clc/rts-account-service
+    container_name: account-service
+    ports:
+      - 8085:8085
+    depends_on:
+      - discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://rts-discovery-server:8761/eureka/
+
+  payment-service:
+    image: devops22clc/rts-payment-service
+    container_name: payment-service
+    ports:
+      - 8084:8084
+    depends_on:
+      - discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  price-service:
+    image: devops22clc/rts-price-service
+    container_name: price-service
+    ports:
+      - 8083:8083
+    depends_on:
+      - discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  exchange-gateway-processor:
+    image: devops22clc/rts-exchange-gateway-processor
+    container_name: exchange-gateway-processor
+    ports:
+      - 8082:8082
+    depends_on:
+      - discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  backtest-service:
+    image: devops22clc/rts-backtest-service
+    container_name: backtest-service
+    ports:
+      - 8086:8086
+    depends_on:
+      - discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+  auth-server:
+    image: quay.io/keycloak/keycloak:26.3.1
+    container_name: auth-server
+    ports:
+      - 7080:8080
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: dev-file
+    command: start-dev
+    volumes:
+      - ./rts-api-gateway/src/main/resources/auth-server-db/h2/:/opt/keycloak/data/h2/
+  ml-inference-service:
+    image: devops22clc/rts-ml-inference-service
+    container_name: ml-inference-service
+    depends_on:
+      - discovery-server
+      - redis
+    env_file:
+      - ./rts-ml-inference-service/.env.docker
+    ports:
+      - "8081:8081"
+
+volumes:
+  price_service_db_data:
+  account_service_db_data:
+  payment_service_db_data:

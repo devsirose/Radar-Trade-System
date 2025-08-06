@@ -9,9 +9,18 @@ spring:
           lower-case-service-id: true
   security:
     oauth2:
+#      client:
+#        registration:
+#          keycloak:
+#            client-id: rts-call-center-ac
+#            client-secret: tjkVejU6tAm3vZDJYDBABjvPEwZH0nxs
+#        provider:
+#          keycloak:
+#            issuer-uri: http://localhost:7080/realms/master
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:7080/realms/master/protocol/openid-connect/certs
+
 server:
   port: 8080
 
@@ -42,3 +51,42 @@ info:
     description: rts-api-gateway
     version: 1.0.0
 
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+token:
+  exchange:
+    provider:
+      keycloak:
+        endpoint: http://localhost:7080/realms/master/protocol/openid-connect/token
+        client-id: rts-call-center-ac
+        client-secret: tjkVejU6tAm3vZDJYDBABjvPEwZH0nxs
+        redirect-uri: http://localhost:8080/callback
+        login-url: http://localhost:7080/realms/master/protocol/openid-connect/auth
+        logout-url: http://localhost:7080/realms/master/protocol/openid-connect/logout
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://auth-server:7080/realms/master/protocol/openid-connect/certs
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-server:8761/eureka/
+
+token:
+  exchange:
+    provider:
+      keycloak:
+        endpoint: http://auth-server:7080/realms/master/protocol/openid-connect/token
+        client-id: rts-call-center-ac
+        client-secret: tjkVejU6tAm3vZDJYDBABjvPEwZH0nxs
+        redirect-uri: http://auth-server:8080/callback
+        login-url: http://auth-server:7080/realms/master/protocol/openid-connect/auth
+        logout-url: http://auth-server:7080/realms/master/protocol/openid-connect/logout

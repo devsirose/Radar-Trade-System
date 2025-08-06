@@ -2,7 +2,7 @@ package com.radartrade.platform.service.exchangeprocessor.service.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.radartrade.platform.service.exchangeprocessor.domain.PriceUpdate;
-import com.radartrade.platform.service.exchangeprocessor.domain.Symbol;
+import com.radartrade.platform.service.common.domain.valueobject.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.util.MapperUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,7 @@ import reactor.core.publisher.Sinks;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -54,7 +55,7 @@ public class PriceConsumer {
 
     private String joinPriceStream() {
         return symbols.stream()
-                .map( symbol -> symbol.getName() + POST_FIX)
+                .map( symbol -> symbol.getName().toLowerCase(Locale.ROOT) + POST_FIX)
                 .collect(Collectors.joining("/"));
     }
 

@@ -3,9 +3,7 @@ package com.radartrade.platform.server.gateway.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -22,12 +20,13 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .authorizeExchange(exchange -> exchange
-                        .anyExchange().permitAll()
-                        .pathMatchers(HttpMethod.GET).hasRole("ADMIN")
+                        .pathMatchers("/public/**",
+                                "/auth/**",
+                                "/actuator/**",
+                                "/callback").permitAll()
+                        .anyExchange().authenticated()
                 )
-                .csrf(csrfSpec -> csrfSpec
-                        .disable()
-                )
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(grantedAuthoritiesExtractor()))
                 )

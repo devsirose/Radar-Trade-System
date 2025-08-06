@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: jdbc:postgresql://localhost:5430/payment-service-db?sslmode=disable
+    password: mysecretpassword
+    username: root
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 600000
+      connection-timeout: 30000
+      pool-name: HikariPool
+server:
+  port: 8084
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+    shutdown:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+endpoint:
+  shutdown:
+    enabled: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  # standalone mode
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+
+payment:
+  provider:
+    version: 2.1.0
+    sandbox-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    secret-key: 2XPQRXXXPH7EW3TLE2H15GM6KNDCN6L4
+    terminal-id: ISED9RTW
+    currency-code: VND
+    order-type:
+    return-url: https://domain.vn/VnPayReturn  # example
+---
+
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-server:8761/eureka/

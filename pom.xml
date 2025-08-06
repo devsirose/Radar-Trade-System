@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.radartrade</groupId>
 	<artifactId>radar-trade-system</artifactId>
-	<version>0.0.1</version>
+	<version>latest</version>
 	<packaging>pom</packaging>
 	<name>radar-trade-system</name>
 	<description>An AI-powered trading platform for real-time price analysis, sentiment detection, and strategy backtesting.</description>
@@ -22,20 +22,19 @@
 		<developer/>
 	</developers>
 	<modules>
-		<module>rts-account-service</module>
 		<module>rts-common</module>
+		<module>rts-account-service</module>
 		<module>rts-payment-service</module>
-		<module>rts-auth-service</module>
 		<module>rts-api-gateway</module>
-		<module>rts-ws-gateway</module>
 		<module>rts-discovery-server</module>
 		<module>rts-price-service</module>
 		<module>rts-backtest-service</module>
-		<module>rts-ml-inference-service</module>
-		<module>rts-order-service</module>
-		<module>rts-order-book-service</module>
+<!--		<module>rts-order-service</module>-->
+<!--		<module>rts-order-book-service</module>-->
 		<module>rts-exchange-gateway-processor</module>
-	</modules>
+        <module>rts-user-service</module>
+        <!--        <module>rts-notification-service</module>-->
+    </modules>
 	<scm>
 		<connection/>
 		<developerConnection/>
@@ -49,6 +48,7 @@
 		<jackson-binding.version>2.18.3</jackson-binding.version>
 		<spring-boot.version>3.4.7</spring-boot.version>
 		<spring-cloud.version>2024.0.1</spring-cloud.version>
+		<spring-security.version>6.4.7</spring-security.version>
 		<maven-compile-plugin.version>3.14.0</maven-compile-plugin.version>
 		<postgresql.version>42.7.3</postgresql.version>
 		<r2dbc.version>1.0.7.RELEASE</r2dbc.version>
@@ -56,6 +56,19 @@
 		<okhttp.version>5.1.0</okhttp.version>
 		<redisson.version>3.47.0</redisson.version>
 		<reactor-test.version>3.4.7</reactor-test.version>
+
+		<!--Deployment Environment-->
+		<docker.image.prefix>devops22clc</docker.image.prefix>
+		<docker.image.exposed.port>9090</docker.image.exposed.port>
+		<docker.image.dockerfile.dir>${basedir}</docker.image.dockerfile.dir>
+		<!-- podman is also supported -->
+		<container.executable>docker</container.executable>
+		<!-- By default, the OCI image is build for the linux/amd64 platform -->
+		<!-- For Apple Silicon M2 Chip you have to change it to the linux/arm64 -->
+		<container.platform>linux/amd64</container.platform>
+		<!-- The -load option is a shortcut for or -output=type=docker -->
+		<!-- Could be changed by the -push option !-->
+		<container.build.extraarg>--push</container.build.extraarg>
 	</properties>
 
 	<dependencyManagement>
@@ -67,24 +80,80 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-bom</artifactId>
+				<version>${spring-security.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven-compile-plugin.version}</version>
-				<configuration>
-					<release>21</release>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compile-plugin.version}</version>
+					<configuration>
+						<release>21</release>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
+
+<profiles>
+	<profile>
+		<id>buildDocker</id>
+		<build>
+			<pluginManagement>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.1.1</version>
+						<executions>
+							<execution>
+								<id>docker-build</id>
+								<phase>install</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${container.executable}</executable>
+									<workingDirectory>${docker.image.dockerfile.dir}</workingDirectory>
+									<arguments>
+										<argument>build</argument>
+										<argument>-f</argument>
+										<argument>Dockerfile</argument>
+										<argument>--build-arg</argument>
+										<argument>ARTIFACT_NAME=${artifactId}</argument>
+										<argument>--build-arg</argument>
+										<argument>VERSION=${project.version}</argument>
+										<argument>--build-arg</argument>
+										<argument>EXPOSED_PORT=${docker.image.exposed.port}</argument>
+										<argument>--platform</argument>
+										<argument>${container.platform}</argument>
+										<argument>${container.build.extraarg}</argument>
+										<argument>-t</argument>
+										<argument>${docker.image.prefix}/${project.artifactId}</argument>
+										<argument>${project.build.directory}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</pluginManagement>
+		</build>
+	</profile>
+</profiles>
 
 </project>
