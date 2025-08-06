@@ -26,7 +26,15 @@ public class SecurityConfig {
                                 "/callback").permitAll()
                         .anyExchange().permitAll()
                 )
-                .cors(ServerHttpSecurity.CorsSpec::disable)
+                .cors(corsSpec -> corsSpec
+                        .configurationSource(request -> {
+                            var config = new org.springframework.web.cors.CorsConfiguration();
+                            config.addAllowedOrigin("*");
+                            config.addAllowedMethod("*");
+                            config.addAllowedHeader("*");
+                            return config;
+                        })
+                )
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(grantedAuthoritiesExtractor()))
