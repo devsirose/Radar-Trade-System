@@ -74,7 +74,7 @@ def interval_to_ttl(interval: str) -> int:
 
 
 # --- API dự đoán giá với cache Redis ---
-@app.route('/api/v1/price/predict/stream', methods=['GET'])
+@app.route('/api/v1/ml-inference/predict/stream', methods=['GET'])
 def predict_stream():
     symbol = request.args.get('symbol')
     interval = request.args.get('interval', '1m')  # default to 1m
@@ -137,6 +137,28 @@ def predict_stream():
 
     return Response(generate(), mimetype='text/event-stream')
 
-# --- Main ---
+from py_eureka_client import eureka_client
+
+# --- Config Eureka ---
+EUREKA_SERVER = os.getenv("EUREKA_SERVER", "http://localhost:8761")
+SERVICE_PORT = int(os.getenv("SERVICE_PORT", 8081))
+SERVICE_NAME = os.getenv("SERVICE_NAME", "ml-inference-service")
+INSTANCE_IP = os.getenv("INSTANCE_IP", "127.0.0.1")
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081, debug=True)
+    # Đăng ký với Eureka
+    eureka_client.init(
+        eureka_server=EUREKA_SERVER,
+        app_name=SERVICE_NAME,
+        instance_port=SERVICE_PORT,
+        instance_ip=INSTANCE_IP,
+        health_check_url=f"http://{INSTANCE_IP}:{SERVICE_PORT}/health",
+        home_page_url=f"http://{INSTANCE_IP}:{SERVICE_PORT}/",
+        status_page_url=f"http://{INSTANCE_IP}:{SERVICE_PORT}/info",
+        data_center_name="MyOwn",
+        renewal_interval_in_secs=30,
+        duration_in_secs=90,
+    )
+
+    # Flask run
+    app.run(host='0.0.0.0', port=SERVICE_PORT, debug=True)
