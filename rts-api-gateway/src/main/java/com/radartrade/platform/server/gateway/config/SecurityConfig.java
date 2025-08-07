@@ -24,8 +24,9 @@ public class SecurityConfig {
                                 "/auth/**",
                                 "/actuator/**",
                                 "/callback").permitAll()
-                        .anyExchange().authenticated()
+                        .anyExchange().permitAll()
                 )
+                .cors(ServerHttpSecurity.CorsSpec::disable)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(grantedAuthoritiesExtractor()))

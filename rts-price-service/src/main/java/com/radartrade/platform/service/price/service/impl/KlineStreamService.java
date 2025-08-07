@@ -72,4 +72,24 @@ public class KlineStreamService {
                             .thenMany(Flux.fromIterable(klineList));
                 });
     }
+
+    // =================== PHƯƠNG THỨC MỚI ĐÃ THÊM VÀO ===================
+    /**
+     * Lắng nghe một channel trên Redis để nhận các cập nhật kline thời gian thực.
+     * @param symbol Cặp giao dịch, ví dụ: "BTCUSDT"
+     * @param interval Khung thời gian, ví dụ: "1m"
+     * @return một Flux<KlineUpdate> liên tục từ Redis Pub/Sub.
+     */
+    public Flux<KlineUpdate> getLiveStream(String symbol, String interval) {
+        // Tạo tên channel dựa trên symbol và interval, ví dụ: "kline:update:BTCUSDT:1m"
+        String channelName = KlineRedisKeyGenerator.generateKlineTopic(symbol, interval);
+        log.info("Subscribing to real-time kline updates on channel: {}", channelName);
+
+        return redisOperations.listenToChannel(channelName)
+                .map(message -> {
+                    log.debug("Received real-time message on channel {}: {}", channelName, message.getMessage());
+                    return message.getMessage(); // Lấy đối tượng KlineUpdate từ tin nhắn
+                });
+    }
+    // =================================================================
 }

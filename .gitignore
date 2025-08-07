@@ -31,3 +31,21 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+
+# Database local
+*.db
+
+# Environment & config
+.env
+config.py
+
+# Logs
+*.log

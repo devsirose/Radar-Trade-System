@@ -1,6 +1,5 @@
 package com.radartrade.platform.service.price.controller;
 
-
 import com.radartrade.platform.service.price.domain.KlineUpdate;
 import com.radartrade.platform.service.price.service.impl.KlineStreamService;
 import org.springframework.http.MediaType;
@@ -25,12 +24,29 @@ public class KlineStreamController {
                                                @RequestParam(defaultValue = "500") Integer limit) {
         return klineStreamService.consumeAndRetrieveKlineUpdate(symbol, interval, limit);
     }
+
     @GetMapping(value = "/stream/cacheable", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<KlineUpdate> streamAndCacheableKlineUpdate(@RequestParam String symbol,
-                                      @RequestParam String interval,
-                                      @RequestParam(defaultValue = "500") Integer limit) {
+                                                           @RequestParam String interval,
+                                                           @RequestParam(defaultValue = "500") Integer limit) {
         return klineStreamService.consumeAndCacheKlineUpdate(symbol, interval)
                 .take(limit);
     }
-}
 
+    // =================== ENDPOINT MỚI ĐÃ THÊM VÀO ===================
+    /**
+     * Cung cấp một luồng dữ liệu kline thời gian thực và không bao giờ kết thúc.
+     * Endpoint này sẽ được frontend gọi để nhận các cập nhật liên tục.
+     * @param symbol Cặp giao dịch, ví dụ: "BTCUSDT"
+     * @param interval Khung thời gian, ví dụ: "1m"
+     * @return một Flux<KlineUpdate> liên tục.
+     */
+    @GetMapping(value = "/stream/live", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public Flux<KlineUpdate> streamLiveKlineUpdate(@RequestParam String symbol,
+                                                   @RequestParam String interval) {
+        // Giả định rằng bạn có một phương thức trong service để lấy stream real-time,
+        // ví dụ như từ Redis Pub/Sub hoặc một nguồn dữ liệu real-time khác.
+        return klineStreamService.getLiveStream(symbol, interval);
+    }
+    // =================================================================
+}
