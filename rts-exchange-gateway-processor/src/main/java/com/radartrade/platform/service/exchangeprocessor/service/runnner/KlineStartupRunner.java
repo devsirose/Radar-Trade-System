@@ -4,6 +4,7 @@ import com.radartrade.platform.service.common.domain.valueobject.Symbol;
 import com.radartrade.platform.service.exchangeprocessor.repository.KlineReactiveRepository;
 import com.radartrade.platform.service.exchangeprocessor.service.client.KlineStreamConsumer;
 import com.radartrade.platform.service.exchangeprocessor.service.client.SymbolConsumer;
+import com.radartrade.platform.service.exchangeprocessor.service.impl.KlinePubService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -22,10 +23,13 @@ public class KlineStartupRunner implements ApplicationRunner {
     private final int MAX_SUBSTREAM = 100;
     private final int MAX_KLINE_LIMIT = 1000;
     private final KlineReactiveRepository klineReactiveRepository;
-
-    public KlineStartupRunner(SymbolConsumer symbolConsumer, KlineReactiveRepository klineReactiveRepository) {
+    private final KlinePubService klinePubService;
+    public KlineStartupRunner(SymbolConsumer symbolConsumer,
+                              KlineReactiveRepository klineReactiveRepository,
+                              KlinePubService klinePubService) {
         this.symbolConsumer = symbolConsumer;
         this.klineReactiveRepository = klineReactiveRepository;
+        this.klinePubService = klinePubService;
     }
     @PostConstruct
     public void streamKlineUpdatesToDb() {
@@ -43,6 +47,7 @@ public class KlineStartupRunner implements ApplicationRunner {
                                         numberOfRow > 0 ? false : true)
                 )
                 .flatMap(klineReactiveRepository::save)
+                .flatMap(klinePubService::publishKlineUpdate)
                 .subscribe();
     }
 

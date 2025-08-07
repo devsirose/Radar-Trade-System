@@ -44,8 +44,7 @@ public class KlineStreamController {
     @GetMapping(value = "/stream/live", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<KlineUpdate> streamLiveKlineUpdate(@RequestParam String symbol,
                                                    @RequestParam String interval) {
-        // Giả định rằng bạn có một phương thức trong service để lấy stream real-time,
-        // ví dụ như từ Redis Pub/Sub hoặc một nguồn dữ liệu real-time khác.
+
         return klineStreamService.getLiveStream(symbol, interval);
     }
     // =================================================================

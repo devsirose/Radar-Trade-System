@@ -1,10 +1,10 @@
 package com.radartrade.platform.service.price.service.impl;
 
 import com.radartrade.platform.service.common.domain.valueobject.KlineInterval;
+import com.radartrade.platform.service.common.util.KlineRedisKeyGenerator;
 import com.radartrade.platform.service.price.config.KlineCacheProperties;
 import com.radartrade.platform.service.price.domain.KlineUpdate;
 import com.radartrade.platform.service.price.service.client.KlineRestConsumer;
-import com.radartrade.platform.service.price.util.KlineRedisKeyGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveListOperations;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
